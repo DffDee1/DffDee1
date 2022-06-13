@@ -23,13 +23,19 @@ async def save(user_id, text):
                            f"VALUES (:telegram_id, :text)", values={'telegram_id': user_id, 'text': text})
 
 
-async def read(user_id):
-    messages = await database.fetch_all('SELECT text '
-                                        'FROM messages '
-                                        'WHERE telegram_id = :telegram_id ',
-                                        values={'telegram_id': user_id})
-    return messages
+# async def read(user_id):
+#     messages = await database.fetch_all('SELECT text '
+#                                         'FROM messages '
+#                                         'WHERE telegram_id = :telegram_id ',
+#                                         values={'telegram_id': user_id})
+#     return messages
 
+async def read(user_id):
+    results = await database.fetch_all('SELECT text '
+                                       'FROM messages '
+                                       'WHERE telegram_id = :telegram_id ',
+                                       values={'telegram_id': user_id})
+    return [next(result.values()) for result in results]
 
 @dp.message_handler()
 async def echo(message: types.Message):
