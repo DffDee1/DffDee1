@@ -1,17 +1,20 @@
 import logging
-from aiogram import types
+from config import *
+from aiogram import Bot, types
+from aiogram.dispatcher import Dispatcher
 from aiogram.utils.executor import start_webhook
-from config import bot, dp, WEBHOOK_URL, WEBHOOK_PATH, WEBAPP_HOST, WEBAPP_PORT
-from db import database
+from db import *
+
+
+bot = Bot(token=TOKEN)
+dp = Dispatcher(bot)
 
 
 async def on_startup(dispatcher):
-    await database.connect()
     await bot.set_webhook(WEBHOOK_URL, drop_pending_updates=True)
 
 
 async def on_shutdown(dispatcher):
-    await database.disconnect()
     await bot.delete_webhook()
 
 
@@ -21,11 +24,11 @@ async def save(user_id, text):
 
 
 async def read(user_id):
-    results = await database.fetch_all('SELECT text '
-                                       'FROM messages '
-                                       'WHERE telegram_id = :telegram_id ',
-                                       values={'telegram_id': user_id})
-    return [next(result.values()) for result in results]
+    messages = await database.fetch_all('SELECT text '
+                                        'FROM messages '
+                                        'WHERE telegram_id = :telegram_id ',
+                                        values={'telegram_id': user_id})
+    return messages
 
 
 @dp.message_handler()
@@ -33,6 +36,11 @@ async def echo(message: types.Message):
     await save(message.from_user.id, message.text)
     messages = await read(message.from_user.id)
     await message.answer(messages)
+
+
+@dp.message_handler()
+async def echo(message: types.Message):
+    await message.answer(message.text)
 
 
 if __name__ == '__main__':
