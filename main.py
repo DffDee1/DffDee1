@@ -4,11 +4,14 @@ from aiogram import Bot, types
 from aiogram.dispatcher import Dispatcher
 from aiogram.utils.executor import start_webhook
 from db import *
-
+from soupbruh import *
 
 bot = Bot(token=TOKEN)
 dp = Dispatcher(bot)
 
+async def get_pair():
+    pair = get_price_of_pair('USDT')
+    return pair
 
 async def on_startup(dispatcher):
     await bot.set_webhook(WEBHOOK_URL, drop_pending_updates=True)
@@ -42,7 +45,7 @@ async def read(user_id):
 @dp.message_handler()
 async def echo(message: types.Message):
     await save(message.from_user.id, message.text)
-    messages = await read(message.from_user.id)
+    messages = await get_pair()
     await message.answer(messages)
 
 
