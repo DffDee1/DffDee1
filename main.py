@@ -35,7 +35,7 @@ async def read(user_id):
                                        'FROM messages '
                                        'WHERE telegram_id = :telegram_id ',
                                        values={'telegram_id': user_id})
-    return [next(result.values()) for result in results]
+    return [next(result) for result in results]
 
 @dp.message_handler()
 async def echo(message: types.Message):
