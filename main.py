@@ -9,9 +9,6 @@ from soupbruh import *
 bot = Bot(token=TOKEN)
 dp = Dispatcher(bot)
 
-async def get_pair(pair):
-    pair = get_price_of_pair(pair)
-    return pair
 
 async def on_startup(dispatcher):
     await bot.set_webhook(WEBHOOK_URL, drop_pending_updates=True)
@@ -44,14 +41,11 @@ async def read(user_id):
 
 @dp.message_handler()
 async def echo(message: types.Message):
-    await save(message.from_user.id, message.text)
-    messages = await get_pair(message.text)
-    await message.answer(messages)
-
-
-@dp.message_handler()
-async def echo(message: types.Message):
-    await message.answer(message.text)
+    if message.text.isdigit():
+        await message.answer('wtf')
+    else:
+        messages = await get_price_of_pair(message.text)
+        await message.answer(messages)
 
 
 if __name__ == '__main__':
