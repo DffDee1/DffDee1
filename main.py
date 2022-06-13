@@ -57,7 +57,9 @@ async def echo(message: types.Message):
 
 @dp.message_handler(state=TestStates.TEST_STATE_1)
 async def first_test_state_case_met(message: types.Message):
+    state = dp.current_state(user=message.from_user.id)
     await message.reply('Первый!', reply=False)
+    await state.set_state(TestStates.all()[2])
 
 
 @dp.message_handler(state=TestStates.TEST_STATE_2[0])
