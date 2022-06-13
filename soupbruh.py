@@ -1,13 +1,15 @@
 import requests
 
-def get_price_of_pair(pair: str):
+
+async def get_price_of_pair(pair: str):
     pair = pair.upper()
     url = 'https://api.binance.com/api/v3/ticker/price?symbol=' + pair
     response = requests.get(url)
     json_get = response.json()
     return json_get
 
-def check_pair(pair: str):
+
+async def check_pair(pair: str):
     url = 'https://api.binance.com/api/v3/ticker/price?symbol=' + pair
     response = requests.get(url)
     if response.status_code == 200:
@@ -15,7 +17,8 @@ def check_pair(pair: str):
     else:
         return False
 
-def del_null(a):
+
+async def del_null(a):
     a = str(a)
     a = float(a)
     if a % 1 == 0:
@@ -23,7 +26,7 @@ def del_null(a):
     return a
 
 
-def print_price(json_get):
+async def print_price(json_get):
     pair = json_get['symbol']
     if 'USD' in pair:
         if 'USD' in pair[:4]:
@@ -40,7 +43,7 @@ def print_price(json_get):
     return text
 
 
-def get_price_usdt(message):
+async def get_price_usdt(message):
     str1 = message.text.upper()
     str1 = str1.split()
     if str1[1] != 'USDT':
@@ -71,7 +74,7 @@ def get_price_usdt(message):
         return prnt
 
 
-def plus_func(message):
+async def plus_func(message):
     str1 = message.text.upper()
     str1 = str1.split()
     usdt = get_price_of_pair(str1[1] + 'USDT')
