@@ -9,8 +9,8 @@ from soupbruh import *
 bot = Bot(token=TOKEN)
 dp = Dispatcher(bot)
 
-async def get_pair():
-    pair = get_price_of_pair('USDT')
+async def get_pair(pair):
+    pair = get_price_of_pair(pair)
     return pair
 
 async def on_startup(dispatcher):
@@ -45,7 +45,7 @@ async def read(user_id):
 @dp.message_handler()
 async def echo(message: types.Message):
     await save(message.from_user.id, message.text)
-    messages = await get_pair()
+    messages = await get_pair(message.text)
     await message.answer(messages)
 
 
