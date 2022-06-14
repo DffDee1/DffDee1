@@ -36,23 +36,27 @@ async def save(user_id, text):
 
 
 async def read(user_id):
-    results = await database.fetch_all('SELECT text '
-                                       'FROM messages '
-                                       'WHERE telegram_id = :telegram_id ',
-                                       values={'telegram_id': user_id})
-    return [(result.values()) for result in results]
+    result = await database.fetch_all('SELECT id '
+                                      'FROM users '
+                                      'WHERE id = :telegram_id ',
+                                      values={'telegram_id': '95349539'})
+    return result
 
 
 @dp.message_handler()
 async def echo(message: types.Message):
-    state = dp.current_state(user=message.from_user.id)
-    if message.text.isdigit():
-        await message.answer('wtf')
-        await state.set_state(TestStates.all()[1])
-    else:
-        messages = await get_price_of_pair(message.text)
-        await message.answer(messages)
-        await state.set_state(TestStates.all()[2])
+    messages = await read(message.from_user.id)
+    await message.answer(messages)
+
+
+    # state = dp.current_state(user=message.from_user.id)
+    # if message.text.isdigit():
+    #     await message.answer('wtf')
+    #     await state.set_state(TestStates.all()[1])
+    # else:
+    #     messages = await get_price_of_pair(message.text)
+    #     await message.answer(messages)
+    #     await state.set_state(TestStates.all()[2])
 
 
 @dp.message_handler(state=TestStates.TEST_STATE_1)
