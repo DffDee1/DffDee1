@@ -44,44 +44,28 @@ async def read(user_id):
 
 
 @dp.message_handler()
-async def start(message: types.Message):
+async def echo(message: types.Message):
     state = dp.current_state(user=message.from_user.id)
-    await message.answer('Вы в меню, 1 - крипта, 2 - гос, 3 - home')
-    await state.set_state(BotStates.FIRST_CHOICE)
+    if message.text.isdigit():
+        await message.answer('wtf')
+        await state.set_state(BotStates.all()[1])
+    else:
+        messages = await get_price_of_pair(message.text)
+        await message.answer(messages)
+        await state.set_state(BotStates.FIRST_CHOICE())
 
 
 @dp.message_handler(state=BotStates.FIRST_CHOICE)
 async def first_test_state_case_met(message: types.Message):
     state = dp.current_state(user=message.from_user.id)
-    if message.text == '1':
-        await message.reply('Крипта! 1 - своя пара, 2 - популярные', reply=False)
-        await state.set_state(BotStates.CRYPTO_CHOICE)
-    elif message.text == '2':
-        await message.reply('Гос! 1 - своя пара, 2 - популярные', reply=False)
-        await state.set_state(BotStates.GOS_CHOICE)
-    elif message.text == '3':
-        await message.reply('Гос! 1 - своя пара, 2 - популярные', reply=False)
-        await state.set_state(BotStates.MENU)
+    await message.reply('first!', reply=False)
+    await state.set_state(BotStates.CRYPTO_CHOICE())
 
 
-@dp.message_handler(state=BotStates.CRYPTO_CHOICE)
+@dp.message_handler(state=BotStates.CRYPTO_CHOICE[0])
 async def second_test_state_case_met(message: types.Message):
-    await message.reply('cryptochoice!', reply=False)
+    await message.reply('crypto!', reply=False)
 
-
-@dp.message_handler(state=BotStates.CRYPTO_CHOICE)
-async def second_test_state_case_met(message: types.Message):
-    await message.reply('cryptochoice!', reply=False)
-
-
-@dp.message_handler(state=BotStates.GOS_CHOICE)
-async def second_test_state_case_met(message: types.Message):
-    await message.reply('GOSS!!!!', reply=False)
-
-
-@dp.message_handler(state=BotStates.MENU)
-async def second_test_state_case_met(message: types.Message):
-    await message.reply('MENU!!!!!', reply=False)
 
 if __name__ == '__main__':
     logging.basicConfig(level=logging.INFO)
