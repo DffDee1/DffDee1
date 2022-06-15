@@ -57,16 +57,16 @@ async def echo(message: types.Message):
         await state.set_state(TestStates.all()[2])
 
 
-@dp.message_handler(state=TestStates.FIRST)
+@dp.message_handler(state=TestStates.TEST_STATE_1)
 async def first_test_state_case_met(message: types.Message):
     state = dp.current_state(user=message.from_user.id)
     await message.reply('Первый!', reply=False)
-    await state.set_state(TestStates.all()[2])
+    await state.set_state(TestStates.all()[6])
 
 
-@dp.message_handler(state=TestStates.SECOND)
+@dp.message_handler(state=TestStates.TEST_STATE_6)
 async def second_test_state_case_met(message: types.Message):
-    await message.reply('Второй!', reply=False)
+    await message.reply('6!', reply=False)
 
 
 if __name__ == '__main__':
