@@ -63,14 +63,14 @@ async def first_test_state_case_met(message: types.Message):
         await state.set_state(TestStates.all()[3])
 
 
-@dp.message_handler(state=TestStates.TEST_STATE_2)
+@dp.message_handler(state=TestStates.TEST_STATE_2[0])
 async def second_test_state_case_met(message: types.Message):
     state = dp.current_state(user=message.from_user.id)
     await message.reply('yesyes back to menu!', reply=False)
     await state.set_state(TestStates.all()[1])
 
 
-@dp.message_handler(state=TestStates.TEST_STATE_3)
+@dp.message_handler(state=TestStates.TEST_STATE_3[0])
 async def second_test_state_case_met(message: types.Message):
     state = dp.current_state(user=message.from_user.id)
     await message.reply('nono back to menu', reply=False)
