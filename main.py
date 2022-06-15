@@ -50,9 +50,9 @@ async def echo(message: types.Message):
         await message.answer('nothing')
         # await state.set_state(BotStates.all()[1])
     else:
-        messages = 'lesgo to first ch'
+        messages = 'lesgo to crypto ch'
         await message.answer(messages)
-        await state.set_state(BotStates.all()[1])
+        await state.set_state(BotStates.all()[2])
 
 
 @dp.message_handler(state=BotStates.MENU)
