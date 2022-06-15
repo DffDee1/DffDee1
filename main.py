@@ -48,31 +48,33 @@ async def echo(message: types.Message):
     # messages = await read(message.from_user.id)
     # await message.answer(messages)
     state = dp.current_state(user=message.from_user.id)
-    await message.answer('1 - первое, 2 - второе')
-    if message.text == '1':
-        await state.set_state(TestStates.all()[1])
-    elif message.text == '2':
-        await state.set_state(TestStates.all()[2])
-    else:
-        await state.set_state(TestStates.TEST_STATE_3)
+    await message.answer('1 - crypto 2 - gos')
+    await state.set_state(TestStates.all()[1])
 
 
 @dp.message_handler(state=TestStates.TEST_STATE_1)
 async def first_test_state_case_met(message: types.Message):
     state = dp.current_state(user=message.from_user.id)
-    await message.reply('Первый!', reply=False)
+    if message.text == '1':
+        await message.reply('crypto!', reply=False)
+        await state.set_state(TestStates.all()[2])
+    elif message.text == '2':
+        await message.reply('gos!', reply=False)
+        await state.set_state(TestStates.all()[3])
 
 
 @dp.message_handler(state=TestStates.TEST_STATE_2)
 async def second_test_state_case_met(message: types.Message):
     state = dp.current_state(user=message.from_user.id)
-    await message.reply('Второй!', reply=False)
+    await message.reply('yesyes back to menu!', reply=False)
+    await state.set_state(TestStates.all()[1])
 
 
 @dp.message_handler(state=TestStates.TEST_STATE_3)
 async def second_test_state_case_met(message: types.Message):
     state = dp.current_state(user=message.from_user.id)
-    await message.reply('3!', reply=False)
+    await message.reply('nono back to menu', reply=False)
+    await state.set_state(TestStates.all()[1])
 
 
 @dp.message_handler(state=TestStates.TEST_STATE_4)
