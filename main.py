@@ -50,7 +50,7 @@ async def echo(message: types.Message):
         await message.answer('wtf')
         await state.set_state(BotStates.all()[1])
     else:
-        messages = await get_price_of_pair(message.text)
+        messages = 'lesgo to first ch'
         await message.answer(messages)
         await state.set_state(BotStates.FIRST_CHOICE())
 
