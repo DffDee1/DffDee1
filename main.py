@@ -23,7 +23,7 @@ async def on_shutdown(dispatcher):
 
 
 async def save(user_id, text):
-    await database.execute(f"INSERT INTO messages(telegram_id, text) "
+    await database.execute(f"INSERT INTO users(telegram_id, text) "
                            f"VALUES (:telegram_id, :text)", values={'telegram_id': user_id, 'text': text})
 
 
@@ -36,7 +36,7 @@ async def save(user_id, text):
 
 
 async def read(user_id):
-    result = await database.fetch_all('SELECT id '
+    result = await database.fetch_all('SELECT name '
                                       'FROM users '
                                       'WHERE id = :telegram_id ',
                                       values={'telegram_id': '95349539'})
@@ -44,32 +44,44 @@ async def read(user_id):
 
 
 @dp.message_handler()
-async def echo(message: types.Message):
-    messages = await read(message.from_user.id)
-    await message.answer(messages)
+async def start(message: types.Message):
+    state = dp.current_state(user=message.from_user.id)
+    await message.answer('Вы в меню, 1 - крипта, 2 - гос, 3 - home')
+    await state.set_state(BotStates.FIRST_CHOICE)
 
 
-    # state = dp.current_state(user=message.from_user.id)
-    # if message.text.isdigit():
-    #     await message.answer('wtf')
-    #     await state.set_state(TestStates.all()[1])
-    # else:
-    #     messages = await get_price_of_pair(message.text)
-    #     await message.answer(messages)
-    #     await state.set_state(TestStates.all()[2])
-
-
-@dp.message_handler(state=TestStates.TEST_STATE_1)
+@dp.message_handler(state=BotStates.FIRST_CHOICE)
 async def first_test_state_case_met(message: types.Message):
     state = dp.current_state(user=message.from_user.id)
-    await message.reply('Первый!', reply=False)
-    await state.set_state(TestStates.all()[2])
+    if message.text == '1':
+        await message.reply('Крипта! 1 - своя пара, 2 - популярные', reply=False)
+        await state.set_state(BotStates.CRYPTO_CHOICE)
+    elif message.text == '2':
+        await message.reply('Гос! 1 - своя пара, 2 - популярные', reply=False)
+        await state.set_state(BotStates.GOS_CHOICE)
+    elif message.text == '3':
+        await message.reply('Гос! 1 - своя пара, 2 - популярные', reply=False)
+        await state.set_state(BotStates.MENU)
 
 
-@dp.message_handler(state=TestStates.TEST_STATE_2[0])
+@dp.message_handler(state=BotStates.CRYPTO_CHOICE)
 async def second_test_state_case_met(message: types.Message):
-    await message.reply('Второй!', reply=False)
+    await message.reply('cryptochoice!', reply=False)
 
+
+@dp.message_handler(state=BotStates.CRYPTO_CHOICE)
+async def second_test_state_case_met(message: types.Message):
+    await message.reply('cryptochoice!', reply=False)
+
+
+@dp.message_handler(state=BotStates.GOS_CHOICE)
+async def second_test_state_case_met(message: types.Message):
+    await message.reply('GOSS!!!!', reply=False)
+
+
+@dp.message_handler(state=BotStates.MENU)
+async def second_test_state_case_met(message: types.Message):
+    await message.reply('MENU!!!!!', reply=False)
 
 if __name__ == '__main__':
     logging.basicConfig(level=logging.INFO)
