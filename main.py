@@ -54,19 +54,29 @@ async def echo(message: types.Message):
     keyboard = types.ReplyKeyboardMarkup(resize_keyboard=True)
     keyboard.add(*[types.KeyboardButton(name) for name in
                    ['Гос. валюты', 'Криптовалюты', 'Уведомления']])
-    await message.answer('1 - crypto 2 - gos', reply_markup=keyboard)
-    await state.set_state(TestStates.all()[1])
+    text = 'Привет, {}! Я умею показывать курсы валют и обменники!\n' \
+           'Ты можешь воспользоваться вариантами из фотографии или продолжить кнопками!' \
+        .format(message.from_user.first_name)
+    with open('commands.png', 'rb') as photo:
+        await bot.send_photo(message.from_user.id,
+                             photo,
+                             caption=text,
+                             reply_markup=keyboard)
+        await state.set_state(TestStates.all()[1])
 
 
 @dp.message_handler(state=TestStates.TEST_STATE_1)
 async def first_test_state_case_met(message: types.Message):
     state = dp.current_state(user=message.from_user.id)
-    if message.text == '1':
-        await message.reply('crypto!', reply=False)
-        await state.set_state(TestStates.all()[2])
-    elif message.text == '2':
-        await message.reply('gos!', reply=False)
-        await state.set_state(TestStates.all()[3])
+    if message.text == 'Гос. валюты':
+        await message.reply('ГОС!', reply=False)
+
+    elif message.text == 'Криптовалюты':
+        await message.reply('КРИПТА!', reply=False)
+
+    elif message.text == 'Уведомления':
+        await message.reply('УВЕДОМЫ!', reply=False)
+
 
 
 @dp.message_handler(state=TestStates.TEST_STATE_2[0])
