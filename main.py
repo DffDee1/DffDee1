@@ -48,26 +48,73 @@ async def echo(message: types.Message):
     # messages = await read(message.from_user.id)
     # await message.answer(messages)
     state = dp.current_state(user=message.from_user.id)
-    if message.text.isdigit():
-        await message.answer('wtf')
+    await message.answer('1 - первое, 2 - второе')
+    if message.text == '1':
         await state.set_state(TestStates.all()[1])
-    else:
-        messages = await get_price_of_pair(message.text)
-        await message.answer(messages)
+    elif message.text == '2':
         await state.set_state(TestStates.all()[2])
+    else:
+        await state.set_state(TestStates.TEST_STATE_3)
 
 
 @dp.message_handler(state=TestStates.TEST_STATE_1)
 async def first_test_state_case_met(message: types.Message):
     state = dp.current_state(user=message.from_user.id)
     await message.reply('Первый!', reply=False)
-    await state.set_state(TestStates.all()[6])
+
+
+@dp.message_handler(state=TestStates.TEST_STATE_2)
+async def second_test_state_case_met(message: types.Message):
+    state = dp.current_state(user=message.from_user.id)
+    await message.reply('Второй!', reply=False)
+
+
+@dp.message_handler(state=TestStates.TEST_STATE_3)
+async def second_test_state_case_met(message: types.Message):
+    state = dp.current_state(user=message.from_user.id)
+    await message.reply('3!', reply=False)
+
+
+@dp.message_handler(state=TestStates.TEST_STATE_4)
+async def second_test_state_case_met(message: types.Message):
+    state = dp.current_state(user=message.from_user.id)
+    await message.reply('6!', reply=False)
+
+
+@dp.message_handler(state=TestStates.TEST_STATE_5)
+async def second_test_state_case_met(message: types.Message):
+    state = dp.current_state(user=message.from_user.id)
+    await message.reply('6!', reply=False)
 
 
 @dp.message_handler(state=TestStates.TEST_STATE_6)
 async def second_test_state_case_met(message: types.Message):
+    state = dp.current_state(user=message.from_user.id)
     await message.reply('6!', reply=False)
 
+
+@dp.message_handler(state=TestStates.TEST_STATE_7)
+async def second_test_state_case_met(message: types.Message):
+    state = dp.current_state(user=message.from_user.id)
+    await message.reply('6!', reply=False)
+
+
+@dp.message_handler(state=TestStates.TEST_STATE_8)
+async def second_test_state_case_met(message: types.Message):
+    state = dp.current_state(user=message.from_user.id)
+    await message.reply('6!', reply=False)
+
+
+@dp.message_handler(state=TestStates.TEST_STATE_9)
+async def second_test_state_case_met(message: types.Message):
+    state = dp.current_state(user=message.from_user.id)
+    await message.reply('6!', reply=False)
+
+
+@dp.message_handler(state=TestStates.TEST_STATE_10)
+async def second_test_state_case_met(message: types.Message):
+    state = dp.current_state(user=message.from_user.id)
+    await message.reply('6!', reply=False)
 
 if __name__ == '__main__':
     logging.basicConfig(level=logging.INFO)
