@@ -14,4 +14,3 @@ class TestStates(Helper):
     TEST_STATE_7 = ListItem()
     TEST_STATE_8 = ListItem()
     TEST_STATE_9 = ListItem()
-    TEST_STATE_10 = ListItem()

@@ -113,11 +113,6 @@ async def second_test_state_case_met(message: types.Message):
     await message.reply('9!', reply=False)
 
 
-@dp.message_handler(state=TestStates.TEST_STATE_10)
-async def second_test_state_case_met(message: types.Message):
-    state = dp.current_state(user=message.from_user.id)
-    await message.reply('10! пиздец))))', reply=False)
-
 if __name__ == '__main__':
     logging.basicConfig(level=logging.INFO)
     start_webhook(
