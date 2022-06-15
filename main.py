@@ -55,6 +55,12 @@ async def echo(message: types.Message):
         await state.set_state(BotStates.all()[1])
 
 
+@dp.message_handler(state=BotStates.MENU)
+async def first_test_state_case_met(message: types.Message):
+    state = dp.current_state(user=message.from_user.id)
+    await message.reply('MENU????!', reply=False)
+
+
 @dp.message_handler(state=BotStates.FIRST_CHOICE)
 async def first_test_state_case_met(message: types.Message):
     state = dp.current_state(user=message.from_user.id)
