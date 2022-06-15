@@ -80,13 +80,13 @@ async def second_test_state_case_met(message: types.Message):
 @dp.message_handler(state=TestStates.TEST_STATE_4)
 async def second_test_state_case_met(message: types.Message):
     state = dp.current_state(user=message.from_user.id)
-    await message.reply('6!', reply=False)
+    await message.reply('4!', reply=False)
 
 
 @dp.message_handler(state=TestStates.TEST_STATE_5)
 async def second_test_state_case_met(message: types.Message):
     state = dp.current_state(user=message.from_user.id)
-    await message.reply('6!', reply=False)
+    await message.reply('5!', reply=False)
 
 
 @dp.message_handler(state=TestStates.TEST_STATE_6)
@@ -98,25 +98,25 @@ async def second_test_state_case_met(message: types.Message):
 @dp.message_handler(state=TestStates.TEST_STATE_7)
 async def second_test_state_case_met(message: types.Message):
     state = dp.current_state(user=message.from_user.id)
-    await message.reply('6!', reply=False)
+    await message.reply('7!', reply=False)
 
 
 @dp.message_handler(state=TestStates.TEST_STATE_8)
 async def second_test_state_case_met(message: types.Message):
     state = dp.current_state(user=message.from_user.id)
-    await message.reply('6!', reply=False)
+    await message.reply('8!', reply=False)
 
 
 @dp.message_handler(state=TestStates.TEST_STATE_9)
 async def second_test_state_case_met(message: types.Message):
     state = dp.current_state(user=message.from_user.id)
-    await message.reply('6!', reply=False)
+    await message.reply('9!', reply=False)
 
 
 @dp.message_handler(state=TestStates.TEST_STATE_10)
 async def second_test_state_case_met(message: types.Message):
     state = dp.current_state(user=message.from_user.id)
-    await message.reply('6!', reply=False)
+    await message.reply('10! пиздец))))', reply=False)
 
 if __name__ == '__main__':
     logging.basicConfig(level=logging.INFO)
