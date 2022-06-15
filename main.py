@@ -8,6 +8,9 @@ from soupbruh import *
 from aiogram.contrib.fsm_storage.memory import MemoryStorage
 from aiogram.contrib.middlewares.logging import LoggingMiddleware
 from utils import *
+from aiogram.types import ReplyKeyboardRemove, \
+    ReplyKeyboardMarkup, KeyboardButton, \
+    InlineKeyboardMarkup, InlineKeyboardButton
 
 bot = Bot(token=TOKEN)
 dp = Dispatcher(bot, storage=MemoryStorage())
@@ -48,7 +51,10 @@ async def echo(message: types.Message):
     # messages = await read(message.from_user.id)
     # await message.answer(messages)
     state = dp.current_state(user=message.from_user.id)
-    await message.answer('1 - crypto 2 - gos')
+    keyboard = types.ReplyKeyboardMarkup(resize_keyboard=True)
+    keyboard.add(*[types.KeyboardButton(name) for name in
+                   ['Гос. валюты', 'Криптовалюты', 'Уведомления']])
+    await message.answer('1 - crypto 2 - gos', reply_markup=keyboard)
     await state.set_state(TestStates.all()[1])
 
 
