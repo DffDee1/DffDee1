@@ -45,18 +45,16 @@ async def read(user_id):
 
 @dp.message_handler()
 async def echo(message: types.Message):
-    messages = await read(message.from_user.id)
-    await message.answer(messages)
-
-
-    # state = dp.current_state(user=message.from_user.id)
-    # if message.text.isdigit():
-    #     await message.answer('wtf')
-    #     await state.set_state(TestStates.all()[1])
-    # else:
-    #     messages = await get_price_of_pair(message.text)
-    #     await message.answer(messages)
-    #     await state.set_state(TestStates.all()[2])
+    # messages = await read(message.from_user.id)
+    # await message.answer(messages)
+    state = dp.current_state(user=message.from_user.id)
+    if message.text.isdigit():
+        await message.answer('wtf')
+        await state.set_state(TestStates.all()[1])
+    else:
+        messages = await get_price_of_pair(message.text)
+        await message.answer(messages)
+        await state.set_state(TestStates.all()[2])
 
 
 @dp.message_handler(state=TestStates.TEST_STATE_1)
