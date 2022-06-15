@@ -1,17 +1,12 @@
 from aiogram.utils.helper import Helper, HelperMode, ListItem
 
 
-class BotStates(Helper):
+class TestStates(Helper):
     mode = HelperMode.snake_case
 
-    MENU = ListItem()
-    FIRST_CHOICE = ListItem()
-    CRYPTO_CHOICE = ListItem()
-    GOS_CHOICE = ListItem()
-    CRYPTO_POPULAR = ListItem()
-    CRYPTO_PAIR = ListItem()
-    NOTIF = ListItem()
-    NOTIF_ADD = ListItem()
-    NOTIF_PERCENT = ListItem()
-    NOTIF_END = ListItem()
-    NOTIF_DEL_PAIR = ListItem()
+    TEST_STATE_0 = ListItem()
+    TEST_STATE_1 = ListItem()
+    TEST_STATE_2 = ListItem()
+    TEST_STATE_3 = ListItem()
+    TEST_STATE_4 = ListItem()
+    TEST_STATE_5 = ListItem()

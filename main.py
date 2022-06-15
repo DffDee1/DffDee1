@@ -45,32 +45,30 @@ async def read(user_id):
 
 @dp.message_handler()
 async def echo(message: types.Message):
-    state = dp.current_state(user=message.from_user.id)
-    if message.text.isdigit():
-        await message.answer('nothing')
-        # await state.set_state(BotStates.all()[1])
-    else:
-        messages = 'lesgo to crypto ch'
-        await message.answer(messages)
-        await state.set_state(BotStates.all()[2])
+    messages = await read(message.from_user.id)
+    await message.answer(messages)
 
 
-@dp.message_handler(state=BotStates.MENU)
+    # state = dp.current_state(user=message.from_user.id)
+    # if message.text.isdigit():
+    #     await message.answer('wtf')
+    #     await state.set_state(TestStates.all()[1])
+    # else:
+    #     messages = await get_price_of_pair(message.text)
+    #     await message.answer(messages)
+    #     await state.set_state(TestStates.all()[2])
+
+
+@dp.message_handler(state=TestStates.TEST_STATE_1)
 async def first_test_state_case_met(message: types.Message):
     state = dp.current_state(user=message.from_user.id)
-    await message.reply('MENU????!', reply=False)
+    await message.reply('Первый!', reply=False)
+    await state.set_state(TestStates.all()[2])
 
 
-@dp.message_handler(state=BotStates.FIRST_CHOICE)
-async def first_test_state_case_met(message: types.Message):
-    state = dp.current_state(user=message.from_user.id)
-    await message.reply('first choice!', reply=False)
-    await state.set_state(BotStates.all()[2])
-
-
-@dp.message_handler(state=BotStates.CRYPTO_CHOICE[0])
+@dp.message_handler(state=TestStates.TEST_STATE_2[0])
 async def second_test_state_case_met(message: types.Message):
-    await message.reply('crypto choice!', reply=False)
+    await message.reply('Второй!', reply=False)
 
 
 if __name__ == '__main__':
