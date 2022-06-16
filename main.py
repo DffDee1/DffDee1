@@ -25,9 +25,11 @@ async def on_shutdown(dispatcher):
     await bot.delete_webhook()
 
 
-async def save(user_id, text):
-    await database.execute(f"INSERT INTO users(telegram_id, text) "
-                           f"VALUES (:telegram_id, :text)", values={'telegram_id': user_id, 'text': text})
+async def save(message):
+    await database.execute(f"INSERT INTO users(telegram_id, name) "
+                           f"VALUES (:telegram_id, :name)",
+                           values={'telegram_id': message.from_user.id,
+                                   'name': message.from_user.first_name})
 
 
 # async def read(user_id):
@@ -42,7 +44,7 @@ async def read(user_id):
     result = await database.fetch_all('SELECT name '
                                       'FROM users '
                                       'WHERE id = :telegram_id ',
-                                      values={'telegram_id': '95349539'})
+                                      values={'telegram_id': user_id})
     return result
 
 
@@ -85,7 +87,7 @@ async def start(message: types.Message):
         await state.set_state(TestStates.all()[1])
 
 
-@dp.message_handler(state=TestStates.TEST_STATE_1)      # FIRST CHOICE
+@dp.message_handler(state=TestStates.TEST_STATE_1)                                                        # FIRST CHOICE
 async def first_test_state_case_met(message: types.Message):
     state = dp.current_state(user=message.from_user.id)
     keyboard = types.ReplyKeyboardMarkup(resize_keyboard=True)
@@ -107,14 +109,14 @@ async def first_test_state_case_met(message: types.Message):
 
     elif message.text == '🔔Уведомления':
         keyboard.add(*[types.KeyboardButton(name) for name in
-                       ['🔔Добавить пару', '🔕Удалить пару', '🏠Меню']])
-        await state.set_state(TestStates.all()[5])
+                       ['🔔Добавить пару', '🔕Удалить пару', 'Мои пары', '🏠Меню']])
+        await state.set_state(TestStates.all()[4])
         await message.reply('Выберите вариант',
                             reply=False,
                             reply_markup=keyboard)
 
 
-@dp.message_handler(state=TestStates.TEST_STATE_2)      # CRYPTO
+@dp.message_handler(state=TestStates.TEST_STATE_2)                                                              # CRYPTO
 async def second_test_state_case_met(message: types.Message):
     if message.text == '🏠Меню':
         await menu(message)
@@ -129,6 +131,7 @@ async def second_test_state_case_met(message: types.Message):
                             '\nНапример "btc/rub" без кавычек!',
                             reply=False,
                             reply_markup=keyboard)
+        await state.set_state(TestStates.all()[9])
 
     elif message.text == '📊Популярные пары':
         keyboard.add(*[types.KeyboardButton(name) for name in
@@ -143,7 +146,7 @@ async def second_test_state_case_met(message: types.Message):
                             reply=False)
 
 
-@dp.message_handler(state=TestStates.TEST_STATE_3)      # CRYPTO CHOICE
+@dp.message_handler(state=TestStates.TEST_STATE_3)                                                       # CRYPTO CHOICE
 async def second_test_state_case_met(message: types.Message):
     if message.text == '🏠Меню':
         await menu(message)
@@ -183,22 +186,86 @@ async def second_test_state_case_met(message: types.Message):
     await state.set_state(TestStates.all()[9])
 
 
-@dp.message_handler(state=TestStates.TEST_STATE_4)
+@dp.message_handler(state=TestStates.TEST_STATE_4)                                                               # NOTIF
 async def second_test_state_case_met(message: types.Message):
+    if message.text == '🏠Меню':
+        await menu(message)
+        return None
+
     state = dp.current_state(user=message.from_user.id)
-    await message.reply('4!', reply=False)
+    keyboard = types.ReplyKeyboardMarkup(resize_keyboard=True)
+
+    if message.text == '🔔Добавить пару':
+        keyboard = await menu_add()
+        await message.reply('Введите слитно пару, которую хотите добавить в уведомления.\n'
+                            'Например, "btcrub" без кавычек.',
+                            reply=False,
+                            reply_markup=keyboard)
+        await state.set_state(TestStates.all()[5])
+
+    elif message.text == '🔕Удалить пару':
+        # keyboard.add(*[types.KeyboardButton(name) for name in
+        #                ['🇷🇺RUB', '🇺🇸USDT', '🌐BTC', '🏠Меню']])
+        # await state.set_state(TestStates.all()[3])
+        await message.reply('wait plz',
+                            reply=False,
+                            reply_markup=keyboard)
+
+    elif message.text == 'Мои пары':
+        aboba = await read(message.from_user.id)
+        await message.reply(aboba,
+                            reply=False)
+
+    else:
+        await message.reply('Не понял тебя, воспользуйся кнопками.',
+                            reply=False)
 
 
-@dp.message_handler(state=TestStates.TEST_STATE_5)
+@dp.message_handler(state=TestStates.TEST_STATE_5)                                                           # NOTIF ADD
 async def second_test_state_case_met(message: types.Message):
+    if message.text == '🏠Меню':
+        await menu(message)
+        return None
+
     state = dp.current_state(user=message.from_user.id)
-    await message.reply('5!', reply=False)
+    keyboard = types.ReplyKeyboardMarkup(resize_keyboard=True)
+
+    if message.text == '🔔Добавить пару':
+        if check_pair(message.text):
+            await message.reply('Введите процент\n'
+                                'при изменении цены на (введённый процент) вам будет приходить уведомление!\n',
+                                reply=False,
+                                reply_markup=keyboard)
+            await state.set_state(TestStates.all()[1])
+
+    elif message.text == '🔕Удалить пару':
+        pass
+
+    else:
+        await message.reply('Не понял тебя, воспользуйся кнопками.',
+                            reply=False)
 
 
-@dp.message_handler(state=TestStates.TEST_STATE_6)
-async def second_test_state_case_met(message: types.Message):
-    state = dp.current_state(user=message.from_user.id)
-    await message.reply('6!', reply=False)
+# @dp.message_handler(state=TestStates.TEST_STATE_6)                                                       # NOTIF PERCENT
+# async def second_test_state_case_met(message: types.Message):
+#     if message.text == '🏠Меню':
+#         await menu(message)
+#         return None
+#
+#     state = dp.current_state(user=message.from_user.id)
+#     keyboard = types.ReplyKeyboardMarkup(resize_keyboard=True)
+#
+#     try:
+#         if int(message.text) > 1:
+#
+#
+#     except ValueError:
+#         await message.reply('Пары к какой валюте предлагать?', reply=False)
+#
+#
+#     else:
+#         await message.reply('Не понял тебя, воспользуйся кнопками.',
+#                             reply=False)
 
 
 @dp.message_handler(state=TestStates.TEST_STATE_7)
@@ -247,7 +314,7 @@ async def second_test_state_case_met(message: types.Message):
         await state.set_state(TestStates.all()[1])
 
 
-@dp.message_handler(state=TestStates.TEST_STATE_0)      # GOS
+@dp.message_handler(state=TestStates.TEST_STATE_0)                                                                 # GOS
 async def first_test_state_case_met(message: types.Message):
     await menu(message)
 
