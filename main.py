@@ -33,10 +33,7 @@ async def on_shutdown(dispatcher):
 
 async def save(message):
     await database.execute(f"INSERT INTO users(id, name) "
-                           f"VALUES (:id, :name)",
-                           values={'id': message.from_user.id,
-                                   'name': message.from_user.first_name})
-
+                           f"VALUES ({message.from_user.id}, {message.from_user.first_name})"
 
 # async def read(user_id):
 #     messages = await database.fetch_all('SELECT text '
