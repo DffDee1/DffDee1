@@ -26,9 +26,9 @@ async def on_shutdown(dispatcher):
 
 
 async def save(message):
-    await database.execute(f"INSERT INTO users(telegram_id, name) "
-                           f"VALUES (:telegram_id, :name)",
-                           values={'telegram_id': message.from_user.id,
+    await database.execute(f"INSERT INTO users(id, name) "
+                           f"VALUES (:id, :name)",
+                           values={'id': message.from_user.id,
                                    'name': message.from_user.first_name})
 
 
