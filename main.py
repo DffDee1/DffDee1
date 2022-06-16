@@ -19,7 +19,8 @@ dp = Dispatcher(bot, storage=MemoryStorage())
 dp.middleware.setup(LoggingMiddleware())
 
 DATABASE_URL = os.environ['DATABASE_URL']
-database = psycopg2.connect(DATABASE_URL, sslmode='require')
+conn = psycopg2.connect(DATABASE_URL, sslmode='require')
+database = conn.cursor()
 
 
 async def on_startup(dispatcher):
