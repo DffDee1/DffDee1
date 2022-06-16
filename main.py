@@ -54,8 +54,8 @@ async def menu(message, state):
     keyboard.add(*[types.KeyboardButton(name) for name in
                    ['Гос. валюты', 'Криптовалюты', 'Уведомления']])
     await bot.send_message(message.chat.id,
-                     text="Вы вернулись в меню)",
-                     reply_markup=keyboard)
+                           text="Вы вернулись в меню)",
+                           reply_markup=keyboard)
 
 
 async def menu_add():
@@ -222,8 +222,9 @@ def solo_funcs(message):
                          await print_price(get_price_of_pair(str1[0] + str1[1])))
 
     elif 'pair' in message.text[:5]:
+        price = await get_price_of_pair(message.text[5:].upper())
         bot.send_message(message.chat.id,
-                         await print_price(get_price_of_pair(message.text[5:].upper())))
+                         await print_price(price))
 
     elif '+' in message.text:
         bot.send_message(message.chat.id, await plus_func(message))
