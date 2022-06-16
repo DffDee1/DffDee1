@@ -218,8 +218,9 @@ def solo_funcs(message):
     if '/' in message.text[1:]:
         str1 = message.text.upper()
         str1 = str1.split('/')
+        price = await get_price_of_pair(str1[0] + str1[1])
         bot.send_message(message.chat.id,
-                         await print_price(get_price_of_pair(str1[0] + str1[1])))
+                         await print_price(price))
 
     elif 'pair' in message.text[:5]:
         price = await get_price_of_pair(message.text[5:].upper())
