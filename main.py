@@ -124,7 +124,6 @@ async def second_test_state_case_met(message: types.Message):
     keyboard = types.ReplyKeyboardMarkup(resize_keyboard=True)
 
     if message.text == '⌨Ввести свою пару':
-        await menu(message)
         keyboard = await menu_add()
         await message.reply('Введите пару в формате "coin/coin"'
                             '\nНапример "btc/rub" без кавычек!',
