@@ -46,16 +46,15 @@ async def read(user_id):
     return result
 
 
-async def menu(message, state):
-    if state is not None:
-        await state.set_state(TestStates.all()[1])
-
+async def menu(message):
+    state = dp.current_state(user=message.from_user.id)
     keyboard = types.ReplyKeyboardMarkup(resize_keyboard=True)
     keyboard.add(*[types.KeyboardButton(name) for name in
                    ['Гос. валюты', 'Криптовалюты', 'Уведомления']])
     await bot.send_message(message.chat.id,
                            text="Вы вернулись в меню)",
                            reply_markup=keyboard)
+    await state.set_state(TestStates.all()[1])
 
 
 async def menu_add():
@@ -71,7 +70,7 @@ async def start(message: types.Message):
     keyboard = types.ReplyKeyboardMarkup(resize_keyboard=True)
 
     if message.text == '🏠Меню':
-        await menu(message, state)
+        await menu(message)
 
     keyboard.add(*[types.KeyboardButton(name) for name in
                    ['Гос. валюты', 'Криптовалюты', '🔔Уведомления']])
@@ -118,14 +117,14 @@ async def first_test_state_case_met(message: types.Message):
 @dp.message_handler(state=TestStates.TEST_STATE_2)      # CRYPTO
 async def second_test_state_case_met(message: types.Message):
     if message.text == '🏠Меню':
-        await menu(message, None)
+        await menu(message)
         return None
 
     state = dp.current_state(user=message.from_user.id)
     keyboard = types.ReplyKeyboardMarkup(resize_keyboard=True)
 
     if message.text == '⌨Ввести свою пару':
-        await menu(message, None)
+        await menu(message)
         keyboard = await menu_add()
         await message.reply('Введите пару в формате "coin/coin"'
                             '\nНапример "btc/rub" без кавычек!',
@@ -148,7 +147,7 @@ async def second_test_state_case_met(message: types.Message):
 @dp.message_handler(state=TestStates.TEST_STATE_3)      # CRYPTO CHOICE
 async def second_test_state_case_met(message: types.Message):
     if message.text == '🏠Меню':
-        await menu(message, None)
+        await menu(message)
         return None
 
     state = dp.current_state(user=message.from_user.id)
@@ -238,7 +237,7 @@ async def second_test_state_case_met(message: types.Message):
         await bot.send_message(message.chat.id, await get_price_usdt(message))
 
     elif message.text == '🏠Меню':
-        await menu(message, None)
+        await menu(message)
 
     else:
 
@@ -248,8 +247,6 @@ async def second_test_state_case_met(message: types.Message):
         await bot.send_message(message.chat.id,
                                'Не понял тебя, воспользуйся кнопками!', reply_markup=keyboard)
         await state.set_state(TestStates.all()[1])
-
-
 
 
 if __name__ == '__main__':
