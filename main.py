@@ -214,7 +214,7 @@ async def second_test_state_case_met(message: types.Message):
     await message.reply('8!', reply=False)
 
 
-@dp.message_handler(state=TestStates.TEST_STATE_9)
+@dp.message_handler(state=TestStates.TEST_STATE_9)     # SOLO FUNC
 async def second_test_state_case_met(message: types.Message):
     state = dp.current_state(user=message.from_user.id)
 
@@ -240,13 +240,17 @@ async def second_test_state_case_met(message: types.Message):
         await menu(message)
 
     else:
-
         keyboard = types.ReplyKeyboardMarkup(resize_keyboard=True)
         keyboard.add(*[types.KeyboardButton(name) for name in
                        ['Гос. валюты', 'Криптовалюты', 'Уведомления']])
         await bot.send_message(message.chat.id,
                                'Не понял тебя, воспользуйся кнопками!', reply_markup=keyboard)
         await state.set_state(TestStates.all()[1])
+
+
+@dp.message_handler(state=TestStates.TEST_STATE_0)      # GOS
+async def first_test_state_case_met(message: types.Message):
+    await menu(message)
 
 
 if __name__ == '__main__':
