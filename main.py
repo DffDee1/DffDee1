@@ -93,7 +93,7 @@ async def first_test_state_case_met(message: types.Message):
     if message.text == 'Гос. валюты':
         keyboard.add(*[types.KeyboardButton(name) for name in
                        ['Указать валюту', 'Выбрать валюту', '🏠Меню']])
-        await state.set_state(TestStates.all()[2])
+        await state.set_state(TestStates.all()[0])
         await message.reply('Выберите вариант!',
                             reply=False,
                             reply_markup=keyboard)
@@ -101,7 +101,7 @@ async def first_test_state_case_met(message: types.Message):
     elif message.text == 'Криптовалюты':
         keyboard.add(*[types.KeyboardButton(name) for name in
                        ['⌨Ввести свою пару', '📊Популярные пары', '🏠Меню']])
-        await state.set_state(TestStates.all()[3])
+        await state.set_state(TestStates.all()[2])
         await message.reply('Выберите вариант',
                             reply=False,
                             reply_markup=keyboard)
