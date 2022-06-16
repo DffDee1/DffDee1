@@ -46,14 +46,35 @@ async def read(user_id):
     return result
 
 
-@dp.message_handler()
-async def echo(message: types.Message):
-    # messages = await read(message.from_user.id)
-    # await message.answer(messages)
-    state = dp.current_state(user=message.from_user.id)
+async def menu(message, state):
+    if state is not None:
+        await state.set_state(TestStates.all()[1])
+
     keyboard = types.ReplyKeyboardMarkup(resize_keyboard=True)
     keyboard.add(*[types.KeyboardButton(name) for name in
                    ['Гос. валюты', 'Криптовалюты', 'Уведомления']])
+    await bot.send_message(message.chat.id,
+                     text="Вы вернулись в меню)",
+                     reply_markup=keyboard)
+
+
+async def menu_add():
+    keyboard = types.ReplyKeyboardMarkup(resize_keyboard=True)
+    menus = types.KeyboardButton("🏠Меню")
+    keyboard.add(menus)
+    return keyboard
+
+
+@dp.message_handler()
+async def start(message: types.Message):
+    state = dp.current_state(user=message.from_user.id)
+    keyboard = types.ReplyKeyboardMarkup(resize_keyboard=True)
+
+    if message.text == '🏠Меню':
+        await menu(message, state)
+
+    keyboard.add(*[types.KeyboardButton(name) for name in
+                   ['Гос. валюты', 'Криптовалюты', '🔔Уведомления']])
     text = 'Привет, {}! Я умею показывать курсы валют и обменники!\n' \
            'Ты можешь воспользоваться вариантами из фотографии или продолжить кнопками!' \
         .format(message.from_user.first_name)
@@ -65,32 +86,95 @@ async def echo(message: types.Message):
         await state.set_state(TestStates.all()[1])
 
 
-@dp.message_handler(state=TestStates.TEST_STATE_1)
+@dp.message_handler(state=TestStates.TEST_STATE_1)      # FIRST CHOICE
 async def first_test_state_case_met(message: types.Message):
     state = dp.current_state(user=message.from_user.id)
+    keyboard = types.ReplyKeyboardMarkup(resize_keyboard=True)
     if message.text == 'Гос. валюты':
-        await message.reply('ГОС!', reply=False)
+        keyboard.add(*[types.KeyboardButton(name) for name in
+                       ['Указать валюту', 'Выбрать валюту', '🏠Меню']])
+        await state.set_state(TestStates.all()[2])
+        await message.reply('Выберите вариант!',
+                            reply=False,
+                            reply_markup=keyboard)
 
     elif message.text == 'Криптовалюты':
-        await message.reply('КРИПТА!', reply=False)
+        keyboard.add(*[types.KeyboardButton(name) for name in
+                       ['⌨Ввести свою пару', '📊Популярные пары', '🏠Меню']])
+        await state.set_state(TestStates.all()[3])
+        await message.reply('Выберите вариант',
+                            reply=False,
+                            reply_markup=keyboard)
 
-    elif message.text == 'Уведомления':
-        await message.reply('УВЕДОМЫ!', reply=False)
+    elif message.text == '🔔Уведомления':
+        keyboard.add(*[types.KeyboardButton(name) for name in
+                       ['🔔Добавить пару', '🔕Удалить пару', '🏠Меню']])
+        await state.set_state(TestStates.all()[5])
+        await message.reply('Выберите вариант',
+                            reply=False,
+                            reply_markup=keyboard)
 
 
-
-@dp.message_handler(state=TestStates.TEST_STATE_2[0])
+@dp.message_handler(state=TestStates.TEST_STATE_2)      # CRYPTO
 async def second_test_state_case_met(message: types.Message):
+    if message.text == '🏠Меню':
+        await menu(message, None)
+        return None
+
     state = dp.current_state(user=message.from_user.id)
-    await message.reply('yesyes back to menu!', reply=False)
-    await state.set_state(TestStates.all()[1])
+    keyboard = types.ReplyKeyboardMarkup(resize_keyboard=True)
+
+    if message.text == '⌨Ввести свою пару':
+        await menu(message, None)
+        keyboard = await menu_add()
+        await message.reply('Введите пару в формате "coin/coin"'
+                            '\nНапример "btc/rub" без кавычек!',
+                            reply=False,
+                            reply_markup=keyboard)
+
+    elif message.text == '📊Популярные пары':
+        keyboard.add(*[types.KeyboardButton(name) for name in
+                       ['🇷🇺RUB', '🇺🇸USDT', '🌐BTC', '🏠Меню']])
+        await state.set_state(TestStates.all()[3])
+        await message.reply('Пары к какой валюте предлагать?',
+                            reply=False,
+                            reply_markup=keyboard)
+
+    else:
+        await message.reply('Не понял тебя, воспользуйся кнопками.',
+                            reply=False)
 
 
-@dp.message_handler(state=TestStates.TEST_STATE_3[0])
+@dp.message_handler(state=TestStates.TEST_STATE_3)      # CRYPTO CHOICE
 async def second_test_state_case_met(message: types.Message):
-    state = dp.current_state(user=message.from_user.id)
-    await message.reply('nono back to menu', reply=False)
-    await state.set_state(TestStates.all()[1])
+    if message.text == '🏠Меню':
+        await menu(message, None)
+        return None
+
+    keyboard = types.ReplyKeyboardMarkup(resize_keyboard=True)
+
+    if message.text == '🇷🇺RUB':
+        keyboard.add(*[types.KeyboardButton(name) for name in
+                       ['BTC/RUB', 'ETH/RUB', 'BNB/RUB', 'USDT/RUB', '🏠Меню']])
+        await bot.send_message(message.chat.id,
+                               text="Выберите пару",
+                               reply_markup=keyboard)
+
+    elif message.text == '🇺🇸USDT':
+        keyboard = types.ReplyKeyboardMarkup(resize_keyboard=True)
+        keyboard.add(*[types.KeyboardButton(name) for name in
+                       ['BTC/USDT', 'ETH/USDT', 'BNB/USDT', 'XRP/USDT', '🏠Меню']])
+        await bot.send_message(message.chat.id,
+                               text="Выберите пару",
+                               reply_markup=keyboard)
+
+    elif message.text == '🌐BTC':
+        keyboard = types.ReplyKeyboardMarkup(resize_keyboard=True)
+        keyboard.add(*[types.KeyboardButton(name) for name in
+                       ['ETH/BTC', 'BNB/BTC', 'XRP/BTC', '🏠Меню']])
+        await bot.send_message(message.chat.id,
+                               text="Выберите пару",
+                               reply_markup=keyboard)
 
 
 @dp.message_handler(state=TestStates.TEST_STATE_4)
@@ -127,6 +211,37 @@ async def second_test_state_case_met(message: types.Message):
 async def second_test_state_case_met(message: types.Message):
     state = dp.current_state(user=message.from_user.id)
     await message.reply('9!', reply=False)
+
+
+@dp.message_handler(content_types=['text'])
+def solo_funcs(message):
+    if '/' in message.text[1:]:
+        str1 = message.text.upper()
+        str1 = str1.split('/')
+        bot.send_message(message.chat.id,
+                         await print_price(get_price_of_pair(str1[0] + str1[1])))
+
+    elif 'pair' in message.text[:5]:
+        bot.send_message(message.chat.id,
+                         await print_price(get_price_of_pair(message.text[5:].upper())))
+
+    elif '+' in message.text:
+        bot.send_message(message.chat.id, await plus_func(message))
+
+    elif message.text[0].isdigit():
+        bot.send_message(message.chat.id, await get_price_usdt(message))
+
+    elif message.text == '🏠Меню':
+        menu(message, None)
+
+    else:
+        state = dp.current_state(user=message.from_user.id)
+        keyboard = types.ReplyKeyboardMarkup(resize_keyboard=True)
+        keyboard.add(*[types.KeyboardButton(name) for name in
+                       ['Гос. валюты', 'Криптовалюты', 'Уведомления']])
+        bot.send_message(message.chat.id,
+                         'Не понял тебя, воспользуйся кнопками!', reply_markup=keyboard)
+        await state.set_state(TestStates.all()[1])
 
 
 if __name__ == '__main__':
