@@ -8,6 +8,8 @@ from soupbruh import *
 from aiogram.contrib.fsm_storage.memory import MemoryStorage
 from aiogram.contrib.middlewares.logging import LoggingMiddleware
 from utils import *
+import os
+import psycopg2
 from aiogram.types import ReplyKeyboardRemove, \
     ReplyKeyboardMarkup, KeyboardButton, \
     InlineKeyboardMarkup, InlineKeyboardButton
@@ -15,6 +17,9 @@ from aiogram.types import ReplyKeyboardRemove, \
 bot = Bot(token=TOKEN)
 dp = Dispatcher(bot, storage=MemoryStorage())
 dp.middleware.setup(LoggingMiddleware())
+
+DATABASE_URL = os.environ['DATABASE_URL']
+database = psycopg2.connect(DATABASE_URL, sslmode='require')
 
 
 async def on_startup(dispatcher):
@@ -52,7 +57,7 @@ async def menu(message):
     state = dp.current_state(user=message.from_user.id)
     keyboard = types.ReplyKeyboardMarkup(resize_keyboard=True)
     keyboard.add(*[types.KeyboardButton(name) for name in
-                   ['Гос. валюты', 'Криптовалюты', 'Уведомления']])
+                   ['Гос. валюты', 'Криптовалюты', '🔔Уведомления']])
     await bot.send_message(message.chat.id,
                            text="Вы вернулись в меню)",
                            reply_markup=keyboard)
