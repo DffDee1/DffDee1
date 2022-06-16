@@ -151,6 +151,7 @@ async def second_test_state_case_met(message: types.Message):
         await menu(message, None)
         return None
 
+    state = dp.current_state(user=message.from_user.id)
     keyboard = types.ReplyKeyboardMarkup(resize_keyboard=True)
 
     if message.text == '🇷🇺RUB':
@@ -175,6 +176,13 @@ async def second_test_state_case_met(message: types.Message):
         await bot.send_message(message.chat.id,
                                text="Выберите пару",
                                reply_markup=keyboard)
+
+    else:
+        await bot.send_message(message.chat.id,
+                               text="Не понял тебя, воспользуйся клавиатурой.")
+        return None
+
+    await state.set_state(TestStates.all()[9])
 
 
 @dp.message_handler(state=TestStates.TEST_STATE_4)
@@ -210,22 +218,18 @@ async def second_test_state_case_met(message: types.Message):
 @dp.message_handler(state=TestStates.TEST_STATE_9)
 async def second_test_state_case_met(message: types.Message):
     state = dp.current_state(user=message.from_user.id)
-    await message.reply('9!', reply=False)
 
-
-@dp.message_handler(content_types=['text'])
-async def solo_funcs(message):
     if '/' in message.text[1:]:
         str1 = message.text.upper()
         str1 = str1.split('/')
         price = await get_price_of_pair(str1[0] + str1[1])
         await bot.send_message(message.chat.id,
-                         await print_price(price))
+                               await print_price(price))
 
     elif 'pair' in message.text[:5]:
         price = await get_price_of_pair(message.text[5:].upper())
         await bot.send_message(message.chat.id,
-                         await print_price(price))
+                               await print_price(price))
 
     elif '+' in message.text:
         await bot.send_message(message.chat.id, await plus_func(message))
@@ -237,13 +241,15 @@ async def solo_funcs(message):
         await menu(message, None)
 
     else:
-        state = dp.current_state(user=message.from_user.id)
+
         keyboard = types.ReplyKeyboardMarkup(resize_keyboard=True)
         keyboard.add(*[types.KeyboardButton(name) for name in
                        ['Гос. валюты', 'Криптовалюты', 'Уведомления']])
         await bot.send_message(message.chat.id,
-                         'Не понял тебя, воспользуйся кнопками!', reply_markup=keyboard)
+                               'Не понял тебя, воспользуйся кнопками!', reply_markup=keyboard)
         await state.set_state(TestStates.all()[1])
+
+
 
 
 if __name__ == '__main__':
