@@ -22,6 +22,10 @@ DATABASE_URL = os.environ['DATABASE_URL']
 conn = psycopg2.connect(DATABASE_URL, sslmode='require')
 database = conn.cursor()
 
+database.execute("CREATE TABLE IF NOT EXISTS users ("
+                 "id SERIAL PRIMARY KEY,"
+                 "name CHAR(64))")
+
 
 async def on_startup(dispatcher):
     await bot.set_webhook(WEBHOOK_URL, drop_pending_updates=True)
