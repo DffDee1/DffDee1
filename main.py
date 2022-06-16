@@ -214,34 +214,34 @@ async def second_test_state_case_met(message: types.Message):
 
 
 @dp.message_handler(content_types=['text'])
-def solo_funcs(message):
+async def solo_funcs(message):
     if '/' in message.text[1:]:
         str1 = message.text.upper()
         str1 = str1.split('/')
         price = await get_price_of_pair(str1[0] + str1[1])
-        bot.send_message(message.chat.id,
+        await bot.send_message(message.chat.id,
                          await print_price(price))
 
     elif 'pair' in message.text[:5]:
         price = await get_price_of_pair(message.text[5:].upper())
-        bot.send_message(message.chat.id,
+        await bot.send_message(message.chat.id,
                          await print_price(price))
 
     elif '+' in message.text:
-        bot.send_message(message.chat.id, await plus_func(message))
+        await bot.send_message(message.chat.id, await plus_func(message))
 
     elif message.text[0].isdigit():
-        bot.send_message(message.chat.id, await get_price_usdt(message))
+        await bot.send_message(message.chat.id, await get_price_usdt(message))
 
     elif message.text == '🏠Меню':
-        menu(message, None)
+        await menu(message, None)
 
     else:
         state = dp.current_state(user=message.from_user.id)
         keyboard = types.ReplyKeyboardMarkup(resize_keyboard=True)
         keyboard.add(*[types.KeyboardButton(name) for name in
                        ['Гос. валюты', 'Криптовалюты', 'Уведомления']])
-        bot.send_message(message.chat.id,
+        await bot.send_message(message.chat.id,
                          'Не понял тебя, воспользуйся кнопками!', reply_markup=keyboard)
         await state.set_state(TestStates.all()[1])
 
