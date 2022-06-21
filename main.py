@@ -90,6 +90,7 @@ class Pschedule:
 
 @repeat(every(1).minutes)
 def check():
+    pass
 
 
 try:
