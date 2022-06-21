@@ -67,11 +67,9 @@ async def save(message):
 
 
 async def read(user_id):
-    result = await curs.fetch_all('SELECT name '
-                                      'FROM users '
-                                      'WHERE id = :telegram_id ',
-                                  values={'telegram_id': user_id})
-    return result
+    curs.execute(f"SELECT pair from users where chat_id = {user_id}")
+    res = curs.fetchone()
+    return res
 
 
 async def menu(message):
@@ -240,7 +238,7 @@ async def second_test_state_case_met(message: types.Message):
                             reply_markup=keyboard)
 
     elif message.text == 'Мои пары':
-        aboba = await read(message.from_user.id)
+        aboba = await read(message.chat.id)
         await message.reply(aboba,
                             reply=False)
 
