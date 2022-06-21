@@ -86,9 +86,9 @@ async def save(message):
 
 
 async def read(message):
-    
+
     try:
-        curs.execute(f"SELECT pair from users")
+        curs.execute(f"SELECT chat_id, pair from users")
         res = curs.fetchone()
         return res
 
@@ -165,7 +165,7 @@ async def first_test_state_case_met(message: types.Message):
         keyboard.add(*[types.KeyboardButton(name) for name in
                        ['🔔Добавить пару', '🔕Удалить пару', 'Мои пары', '🏠Меню']])
         await state.set_state(TestStates.all()[4])
-        await message.reply('Выберите вариант',
+        await message.reply('Выберите вариант' + message.chat.id,
                             reply=False,
                             reply_markup=keyboard)
 
