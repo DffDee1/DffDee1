@@ -474,7 +474,7 @@ async def first_test_state_case_met(message: types.Message):
 
 
 def greet(name):
-    await bot.send_message(625676660, name)
+    bot.send_message(625676660, name)
 
 
 if __name__ == '__main__':
