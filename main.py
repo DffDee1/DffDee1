@@ -58,7 +58,7 @@ async def save(message):
 
     try:
 
-        insert_query = """ INSERT INTO item (chat_id, name, pair)
+        insert_query = """ INSERT INTO users (chat_id, name, pair)
                                       VALUES (%s, %s, %s)"""
         item_tuple = (1, message.chat.id, message.text)
         curs.execute(insert_query, item_tuple)
@@ -69,7 +69,7 @@ async def save(message):
         print("Ошибка при работе с PostgreSQL 2", error)
         curs.execute("rollback")
 
-        insert_query = """ INSERT INTO item (chat_id, name, pair)
+        insert_query = """ INSERT INTO users (chat_id, name, pair)
                                               VALUES (%s, %s, %s)"""
         item_tuple = (1, message.chat.id, message.text)
         curs.execute(insert_query, item_tuple)
