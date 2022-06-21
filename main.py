@@ -59,14 +59,15 @@ class Pschedule:
 
 @repeat(every(1).minutes)
 def check():
-    curs.execute(f"SELECT * from users")
-    database = curs.fetchall()
-
-    for one in database:
-        new_price = get_price_of_pair(one[2])
-        if new_price > one[4]:
-            bot.send_message(one[1],
-                             f'Цена {one[2]} поднялась на {one[5]}%!')
+    # curs.execute(f"SELECT * from users")
+    # database = curs.fetchall()
+    #
+    # for one in database:
+    #     new_price = get_price_of_pair(one[2])
+    #     if new_price > one[4]:
+    #         bot.send_message(one[1],
+    #                          f'Цена {one[2]} поднялась на {one[5]}%!')
+    bot.send_message(625676660, 'second!!!')
 
 
 try:
