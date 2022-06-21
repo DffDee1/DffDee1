@@ -35,9 +35,16 @@ try:
 
 except (Exception, Error) as error:
     print("Ошибка при работе с PostgreSQL 1", error)
+    curs.execute("rollback")
 
-
-
+    create_table_query = '''
+        CREATE TABLE users (
+        chat_id serial NOT NULL PRIMARY KEY,
+        name VARCHAR (100) NOT NULL,
+        pair VARCHAR (100) NOT NULL
+        );'''
+    curs.execute(create_table_query)
+    conn.commit()
 
 async def on_startup(dispatcher):
     await bot.set_webhook(WEBHOOK_URL, drop_pending_updates=True)
@@ -48,14 +55,25 @@ async def on_shutdown(dispatcher):
 
 
 async def save(message):
+
     try:
+
         insert_query = """ INSERT INTO item (chat_id, name, pair)
                                       VALUES (%s, %s, %s)"""
         item_tuple = (1, message.chat.id, message.text)
         curs.execute(insert_query, item_tuple)
         conn.commit()
+
     except (Exception, Error) as error:
+
         print("Ошибка при работе с PostgreSQL 2", error)
+        curs.execute("rollback")
+
+        insert_query = """ INSERT INTO item (chat_id, name, pair)
+                                              VALUES (%s, %s, %s)"""
+        item_tuple = (1, message.chat.id, message.text)
+        curs.execute(insert_query, item_tuple)
+        conn.commit()
 
 
 # async def read(user_id):
