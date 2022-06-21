@@ -117,7 +117,7 @@ async def save(message):
 async def read(message):
 
     try:
-        curs.execute(f"SELECT * users.user_id, users.check_id, pairs.pair_name"
+        curs.execute(f"SELECT users.user_id, users.check_id, pairs.pair_name"
                      f"FROM users, pairs")
         res = curs.fetchone()
         return res
@@ -126,7 +126,7 @@ async def read(message):
         print("Ошибка при работе с PostgreSQL 3", error)
         curs.execute("rollback")
 
-        curs.execute(f"SELECT * users.user_id, users.check_id, pairs.pair_name"
+        curs.execute(f"SELECT users.user_id, users.check_id, pairs.pair_name"
                      f"FROM users, pairs")
         res = curs.fetchone()
         return res
