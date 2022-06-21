@@ -22,9 +22,14 @@ DATABASE_URL = os.environ['DATABASE_URL']
 conn = psycopg2.connect(DATABASE_URL, sslmode='require')
 curs = conn.cursor()
 
-curs.execute("CREATE TABLE IF NOT EXISTS users ("
-                 "id SERIAL PRIMARY KEY,"
-                 "name CHAR(64))")
+create_table_query = '''
+CREATE TABLE users (
+chat_id serial NOT NULL PRIMARY KEY,
+name VARCHAR (100) NOT NULL,
+pair VARCHAR (100) NOT NULL
+);'''
+curs.execute(create_table_query)
+conn.commit()
 
 
 async def on_startup(dispatcher):
@@ -36,7 +41,10 @@ async def on_shutdown(dispatcher):
 
 
 async def save(message):
-    curs.execute(f"INSERT INTO users (id, name) VALUES ({message.chat.id}, {message.text})")
+    insert_query = """ INSERT INTO item (chat_id, name, pair)
+                                  VALUES (%s, %s, %s)"""
+    item_tuple = (1, message.chat.id, message.text)
+    curs.execute(insert_query, item_tuple)
     conn.commit()
 
 
