@@ -72,14 +72,6 @@ def check():
 
 
 
-                    bot.send_message(ids, 'Цена {} изменилась на {}% !!!'
-                                     .format(pair, price - ids[pair]['price']/ids[pair]['price']*100))
-
-
-
-
-
-
 
 
 
