@@ -125,7 +125,8 @@ async def read(message):
     except (Exception, Error) as error:
         print("Ошибка при работе с PostgreSQL 3", error)
         curs.execute("rollback")
-        curs.execute(f"SELECT pair from users where chat_id = {message.chat.id}")
+        curs.execute(f"SELECT * from users"
+                     f"JOIN pairs ON users.check_id = pair_id")
         res = curs.fetchone()
         return res
 
@@ -159,7 +160,7 @@ async def start(message: types.Message):
     keyboard.add(*[types.KeyboardButton(name) for name in
                    ['Гос. валюты', 'Криптовалюты', '🔔Уведомления']])
     text = 'Привет, {}! Я умею показывать курсы валют и обменники!\n' \
-           'Ты можешь воспользоваться вариантами из фотографии или продолжить кнопками!' \
+           'Ты можешь воспользоваться вариантами из фотографии или продолжить кнопками!\n' \
         .format(message.from_user.first_name)
 
     with open('commands.png', 'rb') as photo:
