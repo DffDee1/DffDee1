@@ -61,7 +61,7 @@ async def save(message):
 
         insert_query = """ INSERT INTO users (chat_id, name, pair)
                                       VALUES (%s, %s, %s)"""
-        item_tuple = (1, message.chat.id, message.text)
+        item_tuple = (message.chat.id, message.from_user.first_name, message.text)
         curs.execute(insert_query, item_tuple)
         conn.commit()
 
@@ -72,7 +72,7 @@ async def save(message):
 
         insert_query = """ INSERT INTO users (chat_id, name, pair)
                                               VALUES (%s, %s, %s)"""
-        item_tuple = (1, message.chat.id, message.text)
+        item_tuple = (message.chat.id, message.from_user.first_name, message.text)
         curs.execute(insert_query, item_tuple)
         conn.commit()
 
