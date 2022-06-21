@@ -87,16 +87,16 @@ async def save(message):
 async def read(message):
 
     try:
-        curs.execute("SELECT * from users")
-        res = curs.fetchone()
+        curs.execute("SELECT pair_name from users")
+        res = curs.fetchall()
         return res
 
     except (Exception, Error) as error:
         print("Ошибка при работе с PostgreSQL 3", error)
         curs.execute("rollback")
 
-        curs.execute("SELECT * from users")
-        res = curs.fetchone()
+        curs.execute("SELECT pair_name from users")
+        res = curs.fetchall()
         return res
 
 
