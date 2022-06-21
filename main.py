@@ -32,11 +32,11 @@ curs = conn.cursor()
 
 
 async def noon_print():
-    print("It time to fuck me!")
+    await bot.send_message(625676660, "Its time to fuck me!")
 
 
 async def scheduler():
-    aioschedule.every().day.at("01:40").do(noon_print)
+    aioschedule.every().day.at("01:47").do(noon_print)
     while True:
         await aioschedule.run_pending()
         await asyncio.sleep(1)
