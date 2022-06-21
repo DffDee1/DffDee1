@@ -26,13 +26,13 @@ conn = psycopg2.connect(DATABASE_URL, sslmode='require')
 curs = conn.cursor()
 
 
-def start_process():
+async def start_process():
     Process(target=Pschedule.start_schedule, args=()).start()
 
 
 class Pschedule:
     @staticmethod
-    def start_schedule():
+    async def start_schedule():
         schedule.every().day.at("11:02").do(Pschedule.send_message1)
         schedule.every(1).minutes.do(Pschedule.send_message2)
 
@@ -41,12 +41,12 @@ class Pschedule:
             time.sleep(1)
 
     @staticmethod
-    def send_message1():
-        bot.send_message(625676660, 'Отправка сообщения по времени')
+    async def send_message1():
+        await bot.send_message(625676660, 'Отправка сообщения по времени')
 
     @staticmethod
-    def send_message2():
-        bot.send_message(625676660, 'aaaaa')
+    async def send_message2():
+        await bot.send_message(625676660, 'aaaaa')
         # curs.execute(f"SELECT * from users")
         # database = curs.fetchall()
         #
@@ -58,7 +58,7 @@ class Pschedule:
 
 
 @repeat(every(1).minutes)
-def check():
+async def check():
     # curs.execute(f"SELECT * from users")
     # database = curs.fetchall()
     #
@@ -67,7 +67,7 @@ def check():
     #     if new_price > one[4]:
     #         bot.send_message(one[1],
     #                          f'Цена {one[2]} поднялась на {one[5]}%!')
-    bot.send_message(625676660, 'second!!!')
+    await bot.send_message(625676660, 'second!!!')
 
 
 try:
