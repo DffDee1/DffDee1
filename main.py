@@ -65,7 +65,7 @@ async def save(message):
         curs.execute(insert_query, item_tuple)
         conn.commit()
 
-except (Exception, Error) as error:
+    except (Exception, Error) as error:
 
         print("Ошибка при работе с PostgreSQL 2", error)
         curs.execute("rollback")
