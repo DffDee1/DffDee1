@@ -20,9 +20,9 @@ dp.middleware.setup(LoggingMiddleware())
 
 DATABASE_URL = os.environ['DATABASE_URL']
 conn = psycopg2.connect(DATABASE_URL, sslmode='require')
-database = conn.cursor()
+curs = conn.cursor()
 
-database.execute("CREATE TABLE IF NOT EXISTS users ("
+curs.execute("CREATE TABLE IF NOT EXISTS users ("
                  "id SERIAL PRIMARY KEY,"
                  "name CHAR(64))")
 
@@ -36,8 +36,8 @@ async def on_shutdown(dispatcher):
 
 
 async def save(message):
-    ins = database.prepare("INSERT INTO users (id, name) VALUES ($1, $2)")
-    ins(message.from_user.id, message.from_user.first_name)
+    curs.execute(f"INSERT INTO users (id, name) VALUES ({message.chat.id}, {message.text})")
+    conn.commit()
 
 
 # async def read(user_id):
@@ -49,10 +49,10 @@ async def save(message):
 
 
 async def read(user_id):
-    result = await database.fetch_all('SELECT name '
+    result = await curs.fetch_all('SELECT name '
                                       'FROM users '
                                       'WHERE id = :telegram_id ',
-                                      values={'telegram_id': user_id})
+                                  values={'telegram_id': user_id})
     return result
 
 
@@ -198,7 +198,6 @@ async def second_test_state_case_met(message: types.Message):
 
 @dp.message_handler(state=TestStates.TEST_STATE_4)                                                               # NOTIF
 async def second_test_state_case_met(message: types.Message):
-
     if message.text == '🏠Меню':
         await menu(message)
         return None
@@ -212,6 +211,7 @@ async def second_test_state_case_met(message: types.Message):
                             'Например, "btcrub" без кавычек.',
                             reply=False,
                             reply_markup=keyboard)
+        await save(message)
         await state.set_state(TestStates.all()[5])
 
     elif message.text == '🔕Удалить пару':
@@ -240,7 +240,6 @@ async def second_test_state_case_met(message: types.Message):
 
     state = dp.current_state(user=message.from_user.id)
     keyboard = types.ReplyKeyboardMarkup(resize_keyboard=True)
-    await save(message)
 
     if check_pair(message.text):
         await message.reply('Введите процент\n'
