@@ -24,7 +24,7 @@ try:
                 CREATE TABLE IF NOT EXISTS users (
                 id SERIAL PRIMARY KEY,
                 chat_id BIGINT NOT NULL,
-                pair_name VARCHAR (100) NOT NULL,
+                pair_name VARCHAR (100) NOT NULL UNIQUE,
                 old_price REAL NOT NULL,
                 percent INTEGER NOT NULL
                 );'''
@@ -77,12 +77,31 @@ async def save(message):
         curs.execute(insert_query, item_tuple)
         conn.commit()
 
+
 # async def read(user_id):
 #     messages = await database.fetch_all('SELECT text '
 #                                         'FROM messages '
 #                                         'WHERE telegram_id = :telegram_id ',
 #                                         values={'telegram_id': user_id})
 #     return messages
+
+
+async def check_new_pair(message):
+    try:
+        curs.execute(f"SELECT pair_name from users where user_id = {message.chat.id}")
+        checks = curs.fetchall()
+
+    except (Exception, Error) as error:
+        print("Ошибка при работе с PostgreSQL 3", error)
+        curs.execute("rollback")
+
+        curs.execute("SELECT * from users")
+        checks = curs.fetchall()
+
+    for i in checks:
+        if message.text in i:
+            return False
+    return True
 
 
 async def read(message):
@@ -285,12 +304,19 @@ async def second_test_state_case_met(message: types.Message):
     keyboard = types.ReplyKeyboardMarkup(resize_keyboard=True)
 
     if await check_pair(message.text):
-        await save(message)
-        await message.reply('Введите процент\n'
-                            'при изменении цены на (введённый процент) вам будет приходить уведомление!\n',
-                            reply=False,
-                            reply_markup=keyboard)
-        await state.set_state(TestStates.all()[1])
+
+        if check_new_pair(message):
+            await save(message)
+            await message.reply('Введите процент\n'
+                                'при изменении цены на (введённый процент) вам будет приходить уведомление!\n',
+                                reply=False,
+                                reply_markup=keyboard)
+            await state.set_state(TestStates.all()[1])
+
+        else:
+            await message.reply('Эта пара уже добавлена вами, выберите другую!\n',
+                                reply=False,
+                                reply_markup=keyboard)
 
     elif message.text == '🔕Удалить пару':
         pass
