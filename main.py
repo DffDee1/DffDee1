@@ -47,6 +47,24 @@ except (Exception, Error) as error:
     conn.commit()
 
 
+async def check_new_pair(message):
+    try:
+        curs.execute(f"SELECT pair_name from users where user_id = {message.chat.id}")
+        checks = curs.fetchall()
+
+    except (Exception, Error) as error:
+        print("Ошибка при работе с PostgreSQL 3", error)
+        curs.execute("rollback")
+
+        curs.execute("SELECT * from users")
+        checks = curs.fetchall()
+
+    for i in checks[0]:
+        if message.text in i:
+            return False
+    return True
+
+
 async def on_startup(dispatcher):
     await bot.set_webhook(WEBHOOK_URL, drop_pending_updates=True)
 
@@ -84,24 +102,6 @@ async def save(message):
 #                                         'WHERE telegram_id = :telegram_id ',
 #                                         values={'telegram_id': user_id})
 #     return messages
-
-
-async def check_new_pair(message):
-    try:
-        curs.execute(f"SELECT pair_name from users where user_id = {message.chat.id}")
-        checks = curs.fetchall()
-
-    except (Exception, Error) as error:
-        print("Ошибка при работе с PostgreSQL 3", error)
-        curs.execute("rollback")
-
-        curs.execute("SELECT * from users")
-        checks = curs.fetchall()
-
-    for i in checks:
-        if message.text in i:
-            return False
-    return True
 
 
 async def read(message):
@@ -305,7 +305,7 @@ async def second_test_state_case_met(message: types.Message):
 
     if await check_pair(message.text):
 
-        if check_new_pair(message):
+        if await check_new_pair(message):
             await save(message)
             await message.reply('Введите процент\n'
                                 'при изменении цены на (введённый процент) вам будет приходить уведомление!\n',
