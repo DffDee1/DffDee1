@@ -25,6 +25,7 @@ try:
                 id SERIAL PRIMARY KEY,
                 chat_id INTEGER NOT NULL,
                 pair_name VARCHAR (100) NOT NULL,
+                old_price INTEGER NOT NULL
                 percent INTEGER NOT NULL
                 );'''
     curs.execute(create_table_query)
@@ -35,12 +36,13 @@ except (Exception, Error) as error:
     curs.execute("rollback")
 
     create_table_query = '''
-            CREATE TABLE IF NOT EXISTS users (
-            id SERIAL PRIMARY KEY,
-            chat_id INTEGER NOT NULL,
-            pair_name VARCHAR (100) NOT NULL,
-            percent INTEGER NOT NULL
-            );'''
+                    CREATE TABLE IF NOT EXISTS users (
+                    id SERIAL PRIMARY KEY,
+                    chat_id INTEGER NOT NULL,
+                    pair_name VARCHAR (100) NOT NULL,
+                    old_price INTEGER NOT NULL
+                    percent INTEGER NOT NULL
+                    );'''
     curs.execute(create_table_query)
     conn.commit()
 
@@ -58,8 +60,8 @@ async def save(message):
     try:
 
         insert_query = """ INSERT INTO users (chat_id, pair_name, percent)
-                                      VALUES (%s, %s, %s)"""
-        item_tuple = (message.chat.id, message.text, 6)
+                                      VALUES (%s, %s, %s, %s)"""
+        item_tuple = (message.chat.id, message.text, get_price_of_pair(message.text), 6)
         curs.execute(insert_query, item_tuple)
         conn.commit()
 
@@ -70,8 +72,8 @@ async def save(message):
         curs.execute("rollback")
 
         insert_query = """ INSERT INTO users (chat_id, pair_name, percent)
-                                              VALUES (%s, %s, %s)"""
-        item_tuple = (message.chat.id, message.text, 6)
+                                              VALUES (%s, %s, %s, %s)"""
+        item_tuple = (message.chat.id, message.text, get_price_of_pair(message.text), 6)
         curs.execute(insert_query, item_tuple)
         conn.commit()
 
@@ -85,19 +87,17 @@ async def save(message):
 
 
 async def read(message):
-
     try:
-        curs.execute("SELECT pair_name from users")
-        res = curs.fetchall()
-        return res
+        curs.execute("SELECT * from users")
+        checks = curs.fetchall()
 
     except (Exception, Error) as error:
         print("Ошибка при работе с PostgreSQL 3", error)
         curs.execute("rollback")
 
-        curs.execute("SELECT pair_name from users")
-        res = curs.fetchall()
-        return res
+        curs.execute("SELECT * from users")
+        checks = curs.fetchall()
+    return checks
 
 
 async def menu(message):
