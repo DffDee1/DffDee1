@@ -61,8 +61,8 @@ async def save(message):
 
         insert_query = """ INSERT INTO users (chat_id, pair_name, percent)
                                                       VALUES (%s, %s, %s, %s)"""
-        old_p = await get_price_of_pair(message.text)['price']
-        item_tuple = (message.chat.id, message.text, old_p, 6)
+        old_p = await get_price_of_pair(message.text)
+        item_tuple = (message.chat.id, message.text, old_p['price'], 6)
         curs.execute(insert_query, item_tuple)
         conn.commit()
 
@@ -73,9 +73,9 @@ async def save(message):
         curs.execute("rollback")
 
         insert_query = """ INSERT INTO users (chat_id, pair_name, percent)
-                                              VALUES (%s, %s, %s, %s)"""
-        old_p = await get_price_of_pair(message.text)['price']
-        item_tuple = (message.chat.id, message.text, old_p, 6)
+                                                              VALUES (%s, %s, %s, %s)"""
+        old_p = await get_price_of_pair(message.text)
+        item_tuple = (message.chat.id, message.text, old_p['price'], 6)
         curs.execute(insert_query, item_tuple)
         conn.commit()
 
