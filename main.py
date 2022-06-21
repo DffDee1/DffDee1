@@ -25,7 +25,7 @@ curs = conn.cursor()
 
 try:
     create_table_query = '''
-    CREATE TABLE users (
+    CREATE TABLE IF NOT EXISTS users (
     chat_id serial NOT NULL PRIMARY KEY,
     name VARCHAR (100) NOT NULL,
     pair VARCHAR (100) NOT NULL
