@@ -1,4 +1,7 @@
 import logging
+
+from aiogram.utils import executor
+
 from config import *
 from aiogram import Bot, types
 from aiogram.dispatcher import Dispatcher
@@ -16,6 +19,8 @@ from multiprocessing import *
 import time
 import json
 from telegram import ParseMode
+import asyncio
+import aioschedule
 
 bot = Bot(token=TOKEN)
 dp = Dispatcher(bot, storage=MemoryStorage())
@@ -26,71 +31,19 @@ conn = psycopg2.connect(DATABASE_URL, sslmode='require')
 curs = conn.cursor()
 
 
-def start_process():
-    Process(target=Pschedule.start_schedule, args=()).start()
+async def noon_print():
+    print("It time to fuck me!")
 
 
-class Pschedule:
-    @staticmethod
-    def start_schedule():
-        schedule.every().day.at("11:02").do(Pschedule.send_message1)
-        schedule.every(1).minutes.do(Pschedule.send_message2)
-
-        while True:
-            schedule.run_pending()
-            time.sleep(1)
-
-    @staticmethod
-    def send_message1():
-        bot.send_message(625676660, 'Отправка сообщения по времени')
-
-    @staticmethod
-    def send_message2():
-        is_price_edit = False
-        with open('old_prices.json', 'r') as f:
-            js = json.load(f)
-            for pair in js['pairs']:
-                price = get_price_of_pair(pair)
-                price = price['price']
-                for ids in js['ids']:
-                    if pair in js['ids'][ids].keys():
-
-                        js_percent = int(js['ids'][ids][pair]['percent'])
-                        js_price = js['ids'][ids][pair]['price']
-
-                        if float(price) > (float(js_price) / 100 * (100 + js_percent)):
-                            increase_or_dec = 'ВЫРОСЛА'
-                            percent = (float(price) - float(js_price)) / float(js_price) * 100
-                            bot.send_message(int(ids),
-                                             'ПАРА - *{} {}* на *+{}%*!\n'
-                                             'С *{}* до *{}*\n'
-                                             '_Новая цена для отслеживания - {}_'
-                                             .format(pair, increase_or_dec, round(percent, 2),
-                                                     del_null(js_price), del_null(price), del_null(price)),
-                                             parse_mode=ParseMode.MARKDOWN)
-                            js['ids'][ids][pair]['price'] = price
-                            is_price_edit = True
-
-                        if float(price) < float(js_price) / 100 * (100 - js_percent):
-                            increase_or_dec = 'УПАЛА'
-                            percent = (float(js_price) - float(price)) / float(price) * 100
-                            bot.send_message(int(ids),
-                                             'ПАРА - *{} {}* на *{}%*!\n'
-                                             'С *{}* до *{}*\n'
-                                             '_Новая цена для отслеживания - {}_'
-                                             .format(pair, increase_or_dec, round(percent, 2),
-                                                     del_null(js_price), del_null(price),  del_null(price)),
-                                             parse_mode=ParseMode.MARKDOWN)
-                            js['ids'][ids][pair]['price'] = price
-                            is_price_edit = True
-        if is_price_edit:
-            with open('old_prices.json', 'w') as f:
-                json.dump(js, f, sort_keys=True, indent=4)
+async def scheduler():
+    aioschedule.every().day.at("01:40").do(noon_print)
+    while True:
+        await aioschedule.run_pending()
+        await asyncio.sleep(1)
 
 
-@repeat(every(1).minutes)
-def check():
-    pass
+async def on_startup(_):
+    asyncio.create_task(scheduler())
 
 
 try:
@@ -473,12 +426,8 @@ async def first_test_state_case_met(message: types.Message):
     await menu(message)
 
 
-def greet(name):
-    bot.send_message(625676660, name)
-
-
 if __name__ == '__main__':
-    schedule.every(7).seconds.do(greet, name='adawsefsefd')
+    executor.start_polling(dp, skip_updates=False, on_startup=on_startup)
     logging.basicConfig(level=logging.INFO)
     start_webhook(
         dispatcher=dp,
