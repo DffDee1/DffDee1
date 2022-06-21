@@ -59,7 +59,7 @@ async def check_new_pair(message):
         curs.execute("SELECT * from users")
         checks = curs.fetchall()
 
-    for i in checks[0]:
+    for i in checks:
         if message.text in i:
             return False
     return True
