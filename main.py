@@ -211,7 +211,6 @@ async def second_test_state_case_met(message: types.Message):
                             'Например, "btcrub" без кавычек.',
                             reply=False,
                             reply_markup=keyboard)
-        await save(message)
         await state.set_state(TestStates.all()[5])
 
     elif message.text == '🔕Удалить пару':
@@ -242,6 +241,7 @@ async def second_test_state_case_met(message: types.Message):
     keyboard = types.ReplyKeyboardMarkup(resize_keyboard=True)
 
     if check_pair(message.text):
+        await save(message)
         await message.reply('Введите процент\n'
                             'при изменении цены на (введённый процент) вам будет приходить уведомление!\n',
                             reply=False,
