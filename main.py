@@ -57,14 +57,14 @@ async def on_shutdown(dispatcher):
 
 async def check_new_pair(message):
     try:
-        curs.execute(f"SELECT pair_name from users where user_id = {message.chat.id}")
+        curs.execute(f"SELECT pair_name from users where chat_id = {message.chat.id}")
         checks = curs.fetchall()
 
     except (Exception, Error) as error:
         print("Ошибка при работе с PostgreSQL 3", error)
         curs.execute("rollback")
 
-        curs.execute("SELECT * from users")
+        curs.execute(f"SELECT pair_name from users where chat_id = {message.chat.id}")
         checks = curs.fetchall()
 
     for i in checks:
@@ -106,14 +106,14 @@ async def save(message):
 
 async def read(message):
     try:
-        curs.execute("SELECT * from users")
+        curs.execute(f"SELECT pair_name from users where chat_id = {message.chat.id}")
         checks = curs.fetchall()
 
     except (Exception, Error) as error:
         print("Ошибка при работе с PostgreSQL 3", error)
         curs.execute("rollback")
 
-        curs.execute(f"SELECT pair_name from users where user_id = {message.chat.id}")
+        curs.execute(f"SELECT pair_name from users where chat_id = {message.chat.id}")
         checks = curs.fetchall()
     return checks
 
