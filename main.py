@@ -13,6 +13,7 @@ import psycopg2
 from aiogram.types import ReplyKeyboardRemove, \
     ReplyKeyboardMarkup, KeyboardButton, \
     InlineKeyboardMarkup, InlineKeyboardButton
+from psycopg2 import Error
 
 bot = Bot(token=TOKEN)
 dp = Dispatcher(bot, storage=MemoryStorage())
@@ -22,14 +23,20 @@ DATABASE_URL = os.environ['DATABASE_URL']
 conn = psycopg2.connect(DATABASE_URL, sslmode='require')
 curs = conn.cursor()
 
-create_table_query = '''
-CREATE TABLE users (
-chat_id serial NOT NULL PRIMARY KEY,
-name VARCHAR (100) NOT NULL,
-pair VARCHAR (100) NOT NULL
-);'''
-curs.execute(create_table_query)
-conn.commit()
+try:
+    create_table_query = '''
+    CREATE TABLE users (
+    chat_id serial NOT NULL PRIMARY KEY,
+    name VARCHAR (100) NOT NULL,
+    pair VARCHAR (100) NOT NULL
+    );'''
+    curs.execute(create_table_query)
+    conn.commit()
+
+except (Exception, Error) as error:
+    print("Ошибка при работе с PostgreSQL 1", error)
+
+
 
 
 async def on_startup(dispatcher):
@@ -41,11 +48,14 @@ async def on_shutdown(dispatcher):
 
 
 async def save(message):
-    insert_query = """ INSERT INTO item (chat_id, name, pair)
-                                  VALUES (%s, %s, %s)"""
-    item_tuple = (1, message.chat.id, message.text)
-    curs.execute(insert_query, item_tuple)
-    conn.commit()
+    try:
+        insert_query = """ INSERT INTO item (chat_id, name, pair)
+                                      VALUES (%s, %s, %s)"""
+        item_tuple = (1, message.chat.id, message.text)
+        curs.execute(insert_query, item_tuple)
+        conn.commit()
+    except (Exception, Error) as error:
+        print("Ошибка при работе с PostgreSQL 2", error)
 
 
 # async def read(user_id):
