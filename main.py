@@ -87,6 +87,7 @@ async def start(message: types.Message):
     text = 'Привет, {}! Я умею показывать курсы валют и обменники!\n' \
            'Ты можешь воспользоваться вариантами из фотографии или продолжить кнопками!' \
         .format(message.from_user.first_name)
+
     with open('commands.png', 'rb') as photo:
         await bot.send_photo(message.from_user.id,
                              photo,
@@ -99,6 +100,7 @@ async def start(message: types.Message):
 async def first_test_state_case_met(message: types.Message):
     state = dp.current_state(user=message.from_user.id)
     keyboard = types.ReplyKeyboardMarkup(resize_keyboard=True)
+
     if message.text == 'Гос. валюты':
         keyboard.add(*[types.KeyboardButton(name) for name in
                        ['Указать валюту', 'Выбрать валюту', '🏠Меню']])
@@ -196,6 +198,7 @@ async def second_test_state_case_met(message: types.Message):
 
 @dp.message_handler(state=TestStates.TEST_STATE_4)                                                               # NOTIF
 async def second_test_state_case_met(message: types.Message):
+
     if message.text == '🏠Меню':
         await menu(message)
         return None
@@ -209,7 +212,6 @@ async def second_test_state_case_met(message: types.Message):
                             'Например, "btcrub" без кавычек.',
                             reply=False,
                             reply_markup=keyboard)
-        await save(message)
         await state.set_state(TestStates.all()[5])
 
     elif message.text == '🔕Удалить пару':
@@ -238,6 +240,7 @@ async def second_test_state_case_met(message: types.Message):
 
     state = dp.current_state(user=message.from_user.id)
     keyboard = types.ReplyKeyboardMarkup(resize_keyboard=True)
+    await save(message)
 
     if check_pair(message.text):
         await message.reply('Введите процент\n'
