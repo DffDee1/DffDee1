@@ -41,12 +41,12 @@ class Pschedule:
             time.sleep(1)
 
     @staticmethod
-    async def send_message1():
-        await bot.send_message(625676660, 'Отправка сообщения по времени')
+    def send_message1():
+        bot.send_message(625676660, 'Отправка сообщения по времени')
 
     @staticmethod
-    async def send_message2():
-        await bot.send_message(625676660, 'aaaaa')
+    def send_message2():
+        bot.send_message(625676660, 'aaaaa')
         # curs.execute(f"SELECT * from users")
         # database = curs.fetchall()
         #
@@ -58,14 +58,14 @@ class Pschedule:
 
 
 @repeat(every(1).minutes)
-async def check():
+def check():
     curs.execute(f"SELECT * from users")
     database = curs.fetchall()
 
     for one in database:
-        new_price = await get_price_of_pair(one[2])
+        new_price = get_price_of_pair(one[2])
         if new_price > one[4]:
-            await bot.send_message(one[1],
+            bot.send_message(one[1],
                              f'Цена {one[2]} поднялась на {one[5]}%!')
 
 
