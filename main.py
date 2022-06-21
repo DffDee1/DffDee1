@@ -3,16 +3,12 @@ from config import *
 from aiogram import Bot, types
 from aiogram.dispatcher import Dispatcher
 from aiogram.utils.executor import start_webhook
-from db import *
 from soupbruh import *
 from aiogram.contrib.fsm_storage.memory import MemoryStorage
 from aiogram.contrib.middlewares.logging import LoggingMiddleware
 from utils import *
 import os
 import psycopg2
-from aiogram.types import ReplyKeyboardRemove, \
-    ReplyKeyboardMarkup, KeyboardButton, \
-    InlineKeyboardMarkup, InlineKeyboardButton
 from psycopg2 import Error
 
 bot = Bot(token=TOKEN)
@@ -25,11 +21,18 @@ curs = conn.cursor()
 
 try:
     create_table_query = '''
-    CREATE TABLE IF NOT EXISTS users (
-    chat_id serial NOT NULL PRIMARY KEY,
-    name VARCHAR (100) NOT NULL,
-    pair VARCHAR (100) NOT NULL
-    );'''
+        CREATE TABLE IF NOT EXISTS pairs (
+        pair_id SERIAL PRIMARY KEY,
+        pair_name VARCHAR (100) NOT NULL
+        );'''
+
+    create_table_query2 = '''
+        CREATE TABLE IF NOT EXISTS users (
+        user_id INTEGER PRIMARY KEY,
+        user_name VARCHAR (100) BOT NULL,
+        check_id INTEGER REFERENCES pairs(pair_id)
+        );'''
+
     curs.execute(create_table_query)
     conn.commit()
 
@@ -38,12 +41,20 @@ except (Exception, Error) as error:
     curs.execute("rollback")
 
     create_table_query = '''
-        CREATE TABLE users (
-        chat_id serial NOT NULL PRIMARY KEY,
-        name VARCHAR (100) NOT NULL,
-        pair VARCHAR (100) NOT NULL
-        );'''
+            CREATE TABLE IF NOT EXISTS pairs (
+            pair_id SERIAL PRIMARY KEY,
+            pair_name VARCHAR (100) NOT NULL
+            );'''
     curs.execute(create_table_query)
+    conn.commit()
+
+    create_table_query2 = '''
+            CREATE TABLE IF NOT EXISTS users (
+            user_id INTEGER PRIMARY KEY,
+            user_name VARCHAR (100) BOT NULL,
+            check_id INTEGER REFERENCES pairs(pair_id)
+            );'''
+    curs.execute(create_table_query2)
     conn.commit()
 
 
@@ -59,10 +70,19 @@ async def save(message):
 
     try:
 
-        insert_query = """ INSERT INTO users (chat_id, name, pair)
-                                      VALUES (%s, %s, %s)"""
-        item_tuple = (message.chat.id, message.from_user.first_name, message.text)
-        curs.execute(insert_query, item_tuple)
+        insert_query = """ INSERT INTO pairs (pair)
+                                      VALUES (%s)"""
+        curs.execute(insert_query, message.text)
+        conn.commit()
+
+        insert_query2 = """ INSERT INTO users (user_id, user_name, check_pair)
+                                              VALUES (%s)"""
+
+        curs.execute(f"SELECT pair_id from pairs where pair_name = {message.text}")
+
+        res = curs.fetchone()
+        value = res
+        curs.execute(insert_query2, value)
         conn.commit()
 
     except (Exception, Error) as error:
@@ -70,10 +90,19 @@ async def save(message):
         print("Ошибка при работе с PostgreSQL 2", error)
         curs.execute("rollback")
 
-        insert_query = """ INSERT INTO users (chat_id, name, pair)
-                                              VALUES (%s, %s, %s)"""
-        item_tuple = (message.chat.id, message.from_user.first_name, message.text)
-        curs.execute(insert_query, item_tuple)
+        insert_query = """ INSERT INTO pairs (pair)
+                                              VALUES (%s)"""
+        curs.execute(insert_query, message.text)
+        conn.commit()
+
+        insert_query2 = """ INSERT INTO users (user_id, user_name, check_id)
+                                                      VALUES (%s)"""
+
+        curs.execute(f"SELECT pair_id from pairs where pair_name = {message.text}")
+
+        res = curs.fetchone()
+        value = res
+        curs.execute(insert_query2, value)
         conn.commit()
 
 
@@ -88,7 +117,8 @@ async def save(message):
 async def read(message):
 
     try:
-        curs.execute(f"SELECT chat_id, pair from users")
+        curs.execute(f"SELECT * from users"
+                     f"JOIN pairs ON users.check_id = pair_id")
         res = curs.fetchone()
         return res
 
@@ -301,7 +331,7 @@ async def second_test_state_case_met(message: types.Message):
                             reply=False)
 
 
-# @dp.message_handler(state=TestStates.TEST_STATE_6)                                                       # NOTIF PERCENT
+# @dp.message_handler(state=TestStates.TEST_STATE_6)                                                     # NOTIF PERCENT
 # async def second_test_state_case_met(message: types.Message):
 #     if message.text == '🏠Меню':
 #         await menu(message)
