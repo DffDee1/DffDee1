@@ -47,6 +47,14 @@ except (Exception, Error) as error:
     conn.commit()
 
 
+async def on_startup(dispatcher):
+    await bot.set_webhook(WEBHOOK_URL, drop_pending_updates=True)
+
+
+async def on_shutdown(dispatcher):
+    await bot.delete_webhook()
+
+
 async def check_new_pair(message):
     try:
         curs.execute(f"SELECT pair_name from users where user_id = {message.chat.id}")
@@ -63,14 +71,6 @@ async def check_new_pair(message):
         if message.text in i:
             return False
     return True
-
-
-async def on_startup(dispatcher):
-    await bot.set_webhook(WEBHOOK_URL, drop_pending_updates=True)
-
-
-async def on_shutdown(dispatcher):
-    await bot.delete_webhook()
 
 
 async def save(message):
@@ -113,7 +113,7 @@ async def read(message):
         print("Ошибка при работе с PostgreSQL 3", error)
         curs.execute("rollback")
 
-        curs.execute("SELECT * from users")
+        curs.execute(f"SELECT pair_name from users where user_id = {message.chat.id}")
         checks = curs.fetchall()
     return checks
 
