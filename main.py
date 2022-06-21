@@ -85,10 +85,19 @@ async def save(message):
 #     return messages
 
 
-async def read(user_id):
-    curs.execute(f"SELECT pair from users where chat_id = {user_id}")
-    res = curs.fetchone()
-    return res
+async def read(message):
+    
+    try:
+        curs.execute(f"SELECT pair from users where chat_id = {message.chat.id}")
+        res = curs.fetchone()
+        return res
+
+    except (Exception, Error) as error:
+        print("Ошибка при работе с PostgreSQL 3", error)
+        curs.execute("rollback")
+        curs.execute(f"SELECT pair from users where chat_id = {message.chat.id}")
+        res = curs.fetchone()
+        return res
 
 
 async def menu(message):
@@ -257,7 +266,7 @@ async def second_test_state_case_met(message: types.Message):
                             reply_markup=keyboard)
 
     elif message.text == 'Мои пары':
-        aboba = await read(message.chat.id)
+        aboba = await read(message)
         await message.reply(aboba,
                             reply=False)
 
