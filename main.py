@@ -88,7 +88,7 @@ async def save(message):
 async def read(message):
     
     try:
-        curs.execute(f"SELECT pair from users where chat_id = {message.chat.id}")
+        curs.execute(f"SELECT pair from users")
         res = curs.fetchone()
         return res
 
