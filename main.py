@@ -25,7 +25,7 @@ try:
                 id SERIAL PRIMARY KEY,
                 chat_id INTEGER NOT NULL,
                 pair_name VARCHAR (100) NOT NULL,
-                old_price INTEGER NOT NULL,
+                old_price REAL NOT NULL,
                 percent INTEGER NOT NULL
                 );'''
     curs.execute(create_table_query)
@@ -40,7 +40,7 @@ except (Exception, Error) as error:
                     id SERIAL PRIMARY KEY,
                     chat_id INTEGER NOT NULL,
                     pair_name VARCHAR (100) NOT NULL,
-                    old_price INTEGER NOT NULL,
+                    old_price REAL NOT NULL,
                     percent INTEGER NOT NULL
                     );'''
     curs.execute(create_table_query)
