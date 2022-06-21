@@ -1,7 +1,4 @@
 import logging
-
-from aiogram.utils import executor
-
 from config import *
 from aiogram import Bot, types
 from aiogram.dispatcher import Dispatcher
@@ -20,7 +17,9 @@ import time
 import json
 from telegram import ParseMode
 import asyncio
-import aioschedule
+from apscheduler.schedulers.asyncio import AsyncIOScheduler
+
+scheduler = AsyncIOScheduler()
 
 bot = Bot(token=TOKEN)
 dp = Dispatcher(bot, storage=MemoryStorage())
@@ -30,20 +29,6 @@ DATABASE_URL = os.environ['DATABASE_URL']
 conn = psycopg2.connect(DATABASE_URL, sslmode='require')
 curs = conn.cursor()
 
-
-async def noon_print():
-    await bot.send_message(625676660, "Its time to fuck me!")
-
-
-async def scheduler():
-    aioschedule.every().day.at("01:47").do(noon_print)
-    while True:
-        await aioschedule.run_pending()
-        await asyncio.sleep(1)
-
-
-async def on_startup(_):
-    asyncio.create_task(scheduler())
 
 
 try:
@@ -426,8 +411,13 @@ async def first_test_state_case_met(message: types.Message):
     await menu(message)
 
 
+async def send_mess():
+    await bot.send_message(625676660,
+                           'yeahhhh')
+
+
 if __name__ == '__main__':
-    executor.start_polling(dp, skip_updates=False, on_startup=on_startup)
+    scheduler.add_job(send_mess, "interval", seconds=8, args=(dp,))
     logging.basicConfig(level=logging.INFO)
     start_webhook(
         dispatcher=dp,
