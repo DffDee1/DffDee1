@@ -72,7 +72,7 @@ async def save(message):
 
         insert_query = """ INSERT INTO pairs (pair_id, pair_name)
                                                       VALUES (%s, %s)"""
-        curs.execute(insert_query, (1, message.text))
+        curs.execute(insert_query, (4, message.text))
         conn.commit()
 
         insert_query2 = """ INSERT INTO users (user_id, user_name, check_pair)
@@ -92,7 +92,7 @@ async def save(message):
 
         insert_query = """ INSERT INTO pairs (pair_id, pair_name)
                                               VALUES (%s, %s)"""
-        curs.execute(insert_query, (1, message.text))
+        curs.execute(insert_query, (5, message.text))
         conn.commit()
 
         insert_query2 = """ INSERT INTO users (user_id, user_name, check_pair)
@@ -124,7 +124,7 @@ async def read(message):
         return res
 
     except (Exception, Error) as error:
-        print("Ошибка при работе с PostgreSQL 3", error)
+        print("Ошибка при работе с PostgreSQL 3 - ", error)
         curs.execute("rollback")
 
         curs.execute(f"SELECT users.user_id, users.check_id, pairs.pair_name, pairs.pair_id "
