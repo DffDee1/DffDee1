@@ -23,7 +23,7 @@ try:
     create_table_query = '''
                 CREATE TABLE IF NOT EXISTS users (
                 id SERIAL PRIMARY KEY,
-                chat_id INTEGER NOT NULL,
+                chat_id BIGINT NOT NULL,
                 pair_name VARCHAR (100) NOT NULL,
                 old_price REAL NOT NULL,
                 percent INTEGER NOT NULL
@@ -38,7 +38,7 @@ except (Exception, Error) as error:
     create_table_query = '''
                     CREATE TABLE IF NOT EXISTS users (
                     id SERIAL PRIMARY KEY,
-                    chat_id INTEGER NOT NULL,
+                    chat_id BIGINT NOT NULL,
                     pair_name VARCHAR (100) NOT NULL,
                     old_price REAL NOT NULL,
                     percent INTEGER NOT NULL
