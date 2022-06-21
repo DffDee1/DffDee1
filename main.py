@@ -71,12 +71,12 @@ async def save(message):
     try:
 
         insert_query = """ INSERT INTO pairs (pair_name)
-                                      VALUES (%s)"""
-        curs.execute(insert_query, message.text)
+                                                      VALUES (%s)"""
+        curs.execute(insert_query, (1, message.text))
         conn.commit()
 
         insert_query2 = """ INSERT INTO users (user_id, user_name, check_pair)
-                                              VALUES (%s)"""
+                                                              VALUES (%s)"""
 
         curs.execute(f"SELECT pair_id from pairs where pair_name = {message.text}")
 
@@ -92,7 +92,7 @@ async def save(message):
 
         insert_query = """ INSERT INTO pairs (pair_name)
                                               VALUES (%s)"""
-        curs.execute(insert_query, message.text)
+        curs.execute(insert_query, (1, message.text))
         conn.commit()
 
         insert_query2 = """ INSERT INTO users (user_id, user_name, check_pair)
