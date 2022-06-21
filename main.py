@@ -21,18 +21,12 @@ curs = conn.cursor()
 
 try:
     create_table_query = '''
-        CREATE TABLE IF NOT EXISTS pairs (
-        pair_id SERIAL PRIMARY KEY,
-        pair_name VARCHAR (100) NOT NULL
-        );'''
-
-    create_table_query2 = '''
-        CREATE TABLE IF NOT EXISTS users (
-        user_id INTEGER PRIMARY KEY,
-        user_name VARCHAR (100) BOT NULL,
-        check_id INTEGER REFERENCES pairs(pair_id)
-        );'''
-
+                CREATE TABLE IF NOT EXISTS users (
+                id SERIAL PRIMARY KEY,
+                chat_id INTEGER NOT NULL,
+                pair_name VARCHAR (100) NOT NULL,
+                percent INTEGER NOT NULL
+                );'''
     curs.execute(create_table_query)
     conn.commit()
 
@@ -41,20 +35,13 @@ except (Exception, Error) as error:
     curs.execute("rollback")
 
     create_table_query = '''
-            CREATE TABLE IF NOT EXISTS pairs (
-            pair_id SERIAL PRIMARY KEY,
-            pair_name VARCHAR (100) NOT NULL
+            CREATE TABLE IF NOT EXISTS users (
+            id SERIAL PRIMARY KEY,
+            chat_id INTEGER NOT NULL,
+            pair_name VARCHAR (100) NOT NULL,
+            percent INTEGER NOT NULL
             );'''
     curs.execute(create_table_query)
-    conn.commit()
-
-    create_table_query2 = '''
-            CREATE TABLE IF NOT EXISTS users (
-            user_id INTEGER PRIMARY KEY,
-            user_name VARCHAR (100) BOT NULL,
-            check_id INTEGER REFERENCES pairs(pair_id)
-            );'''
-    curs.execute(create_table_query2)
     conn.commit()
 
 
@@ -70,39 +57,22 @@ async def save(message):
 
     try:
 
-        insert_query = """ INSERT INTO pairs (pair_name)
-                                                      VALUES %s"""
-        curs.execute(insert_query, message.text)
+        insert_query = """ INSERT INTO users (chat_id, pair_name, percent)
+                                      VALUES (%s, %s, %s)"""
+        item_tuple = (message.chat.id, message.text, 6)
+        curs.execute(insert_query, item_tuple)
         conn.commit()
 
-        insert_query2 = """ INSERT INTO users (user_id, user_name, check_pair)
-                                                              VALUES (%s)"""
-
-        curs.execute(f"SELECT pair_id from pairs where pair_name = {message.text}")
-
-        res = curs.fetchone()
-        value = res
-        curs.execute(insert_query2, value)
-        conn.commit()
 
     except (Exception, Error) as error:
 
         print("Ошибка при работе с PostgreSQL 2", error)
         curs.execute("rollback")
 
-        insert_query = """ INSERT INTO pairs (pair_name)
-                                              VALUES %s"""
-        curs.execute(insert_query, message.text)
-        conn.commit()
-
-        insert_query2 = """ INSERT INTO users (user_id, user_name, check_pair)
-                                                      VALUES (%s)"""
-
-        curs.execute(f"SELECT pair_id from pairs where pair_name = {message.text}")
-
-        res = curs.fetchone()
-        value = res
-        curs.execute(insert_query2, value)
+        insert_query = """ INSERT INTO users (chat_id, pair_name, percent)
+                                              VALUES (%s, %s, %s)"""
+        item_tuple = (message.chat.id, message.text, 6)
+        curs.execute(insert_query, item_tuple)
         conn.commit()
 
 
@@ -117,19 +87,15 @@ async def save(message):
 async def read(message):
 
     try:
-        curs.execute(f"SELECT users.user_id, users.check_id, pairs.pair_name "
-                     f"FROM users, pairs "
-                     f"WHERE users.check_id = pairs.pair_id")
+        curs.execute("SELECT * from users")
         res = curs.fetchone()
         return res
 
     except (Exception, Error) as error:
-        print("Ошибка при работе с PostgreSQL 3 - ", error)
+        print("Ошибка при работе с PostgreSQL 3", error)
         curs.execute("rollback")
 
-        curs.execute(f"SELECT users.user_id, users.check_id, pairs.pair_name, pairs.pair_id "
-                     f"FROM users, pairs "
-                     f"WHERE users.check_id = pairs.pair_id")
+        curs.execute("SELECT * from users")
         res = curs.fetchone()
         return res
 
@@ -163,7 +129,7 @@ async def start(message: types.Message):
     keyboard.add(*[types.KeyboardButton(name) for name in
                    ['Гос. валюты', 'Криптовалюты', '🔔Уведомления']])
     text = 'Привет, {}! Я умею показывать курсы валют и обменники!\n' \
-           'Ты можешь воспользоваться вариантами из фотографии или продолжить кнопками!\n' \
+           'Ты можешь воспользоваться вариантами из фотографии или продолжить кнопками!' \
         .format(message.from_user.first_name)
 
     with open('commands.png', 'rb') as photo:
