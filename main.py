@@ -70,8 +70,8 @@ async def save(message):
 
     try:
 
-        insert_query = """ INSERT INTO pairs (pair_name)
-                                                      VALUES (%s)"""
+        insert_query = """ INSERT INTO pairs (pair_id, pair_name)
+                                                      VALUES (%s, %s)"""
         curs.execute(insert_query, (1, message.text))
         conn.commit()
 
@@ -90,8 +90,8 @@ async def save(message):
         print("Ошибка при работе с PostgreSQL 2", error)
         curs.execute("rollback")
 
-        insert_query = """ INSERT INTO pairs (pair_name)
-                                              VALUES (%s)"""
+        insert_query = """ INSERT INTO pairs (pair_id, pair_name)
+                                              VALUES (%s, %s)"""
         curs.execute(insert_query, (1, message.text))
         conn.commit()
 
