@@ -58,21 +58,19 @@ async def on_shutdown(dispatcher):
 async def save(message):
 
     try:
-
-        insert_query = """ INSERT INTO users (chat_id, pair_name, percent)
-                                                      VALUES (%s, %s, %s, %s)"""
+        insert_query = """ INSERT INTO users (chat_id, pair_name, old_price,percent)
+                                                                      VALUES (%s, %s, %s, %s)"""
         old_p = await get_price_of_pair(message.text)
         item_tuple = (message.chat.id, message.text, old_p['price'], 6)
         curs.execute(insert_query, item_tuple)
         conn.commit()
 
-
-    except (Exception, Error) as error:
+except (Exception, Error) as error:
 
         print("Ошибка при работе с PostgreSQL 2", error)
         curs.execute("rollback")
 
-        insert_query = """ INSERT INTO users (chat_id, pair_name, percent)
+        insert_query = """ INSERT INTO users (chat_id, pair_name, old_price,percent)
                                                               VALUES (%s, %s, %s, %s)"""
         old_p = await get_price_of_pair(message.text)
         item_tuple = (message.chat.id, message.text, old_p['price'], 6)
