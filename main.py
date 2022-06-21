@@ -10,6 +10,12 @@ from utils import *
 import os
 import psycopg2
 from psycopg2 import Error
+from schedule import every, repeat
+import schedule
+from multiprocessing import *
+import time
+import json
+from telegram import ParseMode
 
 bot = Bot(token=TOKEN)
 dp = Dispatcher(bot, storage=MemoryStorage())
@@ -18,6 +24,69 @@ dp.middleware.setup(LoggingMiddleware())
 DATABASE_URL = os.environ['DATABASE_URL']
 conn = psycopg2.connect(DATABASE_URL, sslmode='require')
 curs = conn.cursor()
+
+
+def start_process():
+    Process(target=Pschedule.start_schedule, args=()).start()
+
+
+class Pschedule:
+    @staticmethod
+    def start_schedule():
+        schedule.every().day.at("11:02").do(Pschedule.send_message1)
+        schedule.every(1).minutes.do(Pschedule.send_message2)
+
+        while True:
+            schedule.run_pending()
+            time.sleep(1)
+
+    @staticmethod
+    def send_message1():
+        bot.send_message(625676660, 'Отправка сообщения по времени')
+
+    @staticmethod
+    def send_message2():
+        curs.execute(f"SELECT * from users")
+        database = curs.fetchall()
+
+        for one in database:
+            new_price = await get_price_of_pair(one[2])
+            if new_price > one[4]:
+                bot.send_message(one[1],
+                                 f'Цена {one[2]} поднялась на {one[5]}%!')
+
+
+@repeat(every(1).minutes)
+def check():
+    curs.execute(f"SELECT * from users")
+    database = curs.fetchall()
+
+    for one in database:
+        new_price = await get_price_of_pair(one[2])
+        if new_price > one[4]:
+            bot.send_message(one[1],
+                             f'Цена {one[2]} поднялась на {one[5]}%!')
+
+
+
+
+
+
+                    bot.send_message(ids, 'Цена {} изменилась на {}% !!!'
+                                     .format(pair, price - ids[pair]['price']/ids[pair]['price']*100))
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 try:
     create_table_query = '''
