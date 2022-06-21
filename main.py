@@ -26,13 +26,13 @@ conn = psycopg2.connect(DATABASE_URL, sslmode='require')
 curs = conn.cursor()
 
 
-async def start_process():
+def start_process():
     Process(target=Pschedule.start_schedule, args=()).start()
 
 
 class Pschedule:
     @staticmethod
-    async def start_schedule():
+    def start_schedule():
         schedule.every().day.at("11:02").do(Pschedule.send_message1)
         schedule.every(1).minutes.do(Pschedule.send_message2)
 
@@ -41,33 +41,55 @@ class Pschedule:
             time.sleep(1)
 
     @staticmethod
-    async def send_message1():
-        await bot.send_message(625676660, 'Отправка сообщения по времени')
+    def send_message1():
+        bot.send_message(625676660, 'Отправка сообщения по времени')
 
     @staticmethod
-    async def send_message2():
-        await bot.send_message(625676660, 'aaaaa')
-        # curs.execute(f"SELECT * from users")
-        # database = curs.fetchall()
-        #
-        # for one in database:
-        #     new_price = await get_price_of_pair(one[2])
-        #     if new_price > one[4]:
-        #         await bot.send_message(one[1],
-        #                          f'Цена {one[2]} поднялась на {one[5]}%!')
+    def send_message2():
+        is_price_edit = False
+        with open('old_prices.json', 'r') as f:
+            js = json.load(f)
+            for pair in js['pairs']:
+                price = get_price_of_pair(pair)
+                price = price['price']
+                for ids in js['ids']:
+                    if pair in js['ids'][ids].keys():
+
+                        js_percent = int(js['ids'][ids][pair]['percent'])
+                        js_price = js['ids'][ids][pair]['price']
+
+                        if float(price) > (float(js_price) / 100 * (100 + js_percent)):
+                            increase_or_dec = 'ВЫРОСЛА'
+                            percent = (float(price) - float(js_price)) / float(js_price) * 100
+                            bot.send_message(int(ids),
+                                             'ПАРА - *{} {}* на *+{}%*!\n'
+                                             'С *{}* до *{}*\n'
+                                             '_Новая цена для отслеживания - {}_'
+                                             .format(pair, increase_or_dec, round(percent, 2),
+                                                     del_null(js_price), del_null(price), del_null(price)),
+                                             parse_mode=ParseMode.MARKDOWN)
+                            js['ids'][ids][pair]['price'] = price
+                            is_price_edit = True
+
+                        if float(price) < float(js_price) / 100 * (100 - js_percent):
+                            increase_or_dec = 'УПАЛА'
+                            percent = (float(js_price) - float(price)) / float(price) * 100
+                            bot.send_message(int(ids),
+                                             'ПАРА - *{} {}* на *{}%*!\n'
+                                             'С *{}* до *{}*\n'
+                                             '_Новая цена для отслеживания - {}_'
+                                             .format(pair, increase_or_dec, round(percent, 2),
+                                                     del_null(js_price), del_null(price),  del_null(price)),
+                                             parse_mode=ParseMode.MARKDOWN)
+                            js['ids'][ids][pair]['price'] = price
+                            is_price_edit = True
+        if is_price_edit:
+            with open('old_prices.json', 'w') as f:
+                json.dump(js, f, sort_keys=True, indent=4)
 
 
 @repeat(every(1).minutes)
-async def check():
-    # curs.execute(f"SELECT * from users")
-    # database = curs.fetchall()
-    #
-    # for one in database:
-    #     new_price = get_price_of_pair(one[2])
-    #     if new_price > one[4]:
-    #         bot.send_message(one[1],
-    #                          f'Цена {one[2]} поднялась на {one[5]}%!')
-    await bot.send_message(625676660, 'second!!!')
+def check():
 
 
 try:
@@ -450,18 +472,19 @@ async def first_test_state_case_met(message: types.Message):
     await menu(message)
 
 
+def greet(name):
+    await bot.send_message(625676660, name)
+
+
 if __name__ == '__main__':
-    start_process()
-    try:
-        logging.basicConfig(level=logging.INFO)
-        start_webhook(
-            dispatcher=dp,
-            webhook_path=WEBHOOK_PATH,
-            skip_updates=True,
-            on_startup=on_startup,
-            on_shutdown=on_shutdown,
-            host=WEBAPP_HOST,
-            port=WEBAPP_PORT,
-        )
-    except Warning:
-        pass
+    schedule.every(7).seconds.do(greet, name='adawsefsefd')
+    logging.basicConfig(level=logging.INFO)
+    start_webhook(
+        dispatcher=dp,
+        webhook_path=WEBHOOK_PATH,
+        skip_updates=True,
+        on_startup=on_startup,
+        on_shutdown=on_shutdown,
+        host=WEBAPP_HOST,
+        port=WEBAPP_PORT,
+    )
