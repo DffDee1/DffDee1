@@ -450,6 +450,11 @@ async def second_test_state_case_met(message: types.Message):
 async def second_test_state_case_met(message: types.Message):
     state = dp.current_state(user=message.from_user.id)
 
+    if message.text.isdigit():
+        await bot.send_message(message.chat.id,
+                               'Ввести нужно не цифры, воспользуйтесь кнопками!')
+        return None
+
     try:
         await delete(message)
         keyboard = types.ReplyKeyboardMarkup(resize_keyboard=True)
