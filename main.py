@@ -85,6 +85,25 @@ async def view_portf(message):
     return text
 
 
+async def check_pair_in_db(message):
+    try:
+        curs.execute(f"SELECT pair_name from users where chat_id = {message.chat.id}")
+        checks = curs.fetchall()
+
+    except (Exception, Error) as error:
+        print("Ошибка при работе с PostgreSQL 3", error)
+        curs.execute("rollback")
+
+        curs.execute(f"SELECT pair_name from users where chat_id = {message.chat.id}")
+        checks = curs.fetchall()
+
+    for i in checks:
+        if message.text in i:
+            return True
+
+    return False
+
+
 async def check_new_pair(message):
 
     try:
@@ -454,27 +473,33 @@ async def second_test_state_case_met(message: types.Message):
         await bot.send_message(message.chat.id,
                                'Ввести нужно не цифры, воспользуйтесь кнопками!')
         return None
+    
+    elif check_pair_in_db(message):
 
-    try:
-        await delete(message)
-        keyboard = types.ReplyKeyboardMarkup(resize_keyboard=True)
-        keyboard.add(*[types.KeyboardButton(name) for name in
-                       ['Гос. валюты', 'Криптовалюты', '💼 Портфель']])
-        await bot.send_message(message.chat.id,
-                               f'Пара {message.text.upper()} была удалена, возвращаемся в меню!\n\n'
-                               f'Выберите вариант.',
-                               reply_markup=keyboard)
-        await state.set_state(TestStates.all()[1])
+        try:
+            await delete(message)
+            keyboard = types.ReplyKeyboardMarkup(resize_keyboard=True)
+            keyboard.add(*[types.KeyboardButton(name) for name in
+                           ['Гос. валюты', 'Криптовалюты', '💼 Портфель']])
+            await bot.send_message(message.chat.id,
+                                   f'Пара {message.text.upper()} была удалена, возвращаемся в меню!\n\n'
+                                   f'Выберите вариант.',
+                                   reply_markup=keyboard)
+            await state.set_state(TestStates.all()[1])
 
-    except:
+        except:
+            await bot.send_message(message.chat.id,
+                                   'Выбрана несуществующая пара, воспользуйтесь кнопками!')
+
+    else:
         await bot.send_message(message.chat.id,
                                'Выбрана несуществующая пара, воспользуйтесь кнопками!')
 
 
-@dp.message_handler(state=TestStates.TEST_STATE_8)
-async def second_test_state_case_met(message: types.Message):
-    state = dp.current_state(user=message.from_user.id)
-    await message.reply('8!', reply=False)
+# @dp.message_handler(state=TestStates.TEST_STATE_8)
+# async def second_test_state_case_met(message: types.Message):
+#     state = dp.current_state(user=message.from_user.id)
+#     await message.reply('8!', reply=False)
 
 
 @dp.message_handler(state=TestStates.TEST_STATE_9)                                                           # SOLO FUNC
