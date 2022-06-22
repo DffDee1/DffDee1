@@ -76,10 +76,10 @@ async def view_portf(message):
         price = await get_price_of_pair(i[2] + 'USDT')
         price = float(price['price'])
         percent = round((i[3] - price) / price * 100, 2)
-        text += f'*{i[2]}* в кол-ве _{i[4]}_: *{price * i[4]}*$ ({"+" if percent > 0 else ""}{percent}%)\n'
+        text += f'*{i[2]}* в кол-ве _{i[4]}_: *{round(price * i[4], 2)}*$ ({"+" if percent > 0 else ""}{percent}%)\n'
         price_of_all += price * i[4]
     text += f'------------------------------\n' \
-            f'Общая сумма активов = {price_of_all}$'
+            f'Общая сумма активов = {round(price_of_all, 2)}$'
     return text
 
 
@@ -152,7 +152,7 @@ def delete(message):
 
     try:
         curs.execute(f"DELETE FROM users"
-                     f"WHERE user_id = '{message.chat.id}' AND pair = {message.text};")
+                     f"WHERE user_id={message.chat.id} AND pair = {message.text};")
         conn.commit()
 
     except (Exception, Error) as error:
@@ -160,7 +160,7 @@ def delete(message):
         curs.execute("rollback")
 
         curs.execute(f"DELETE FROM users"
-                     f"WHERE user_id = '{message.chat.id}' AND pair = {message.text};")
+                     f"WHERE user_id={message.chat.id} AND pair = {message.text};")
         conn.commit()
 
 
@@ -227,7 +227,7 @@ async def first_test_state_case_met(message: types.Message):
 
     elif message.text == '🔔Уведомления':
         keyboard.add(*[types.KeyboardButton(name) for name in
-                       ['🔔Добавить пару', '🔕Удалить пару', 'Мои пары', '🏠Меню']])
+                       ['➕ Добавить пару', '➖ Удалить пару', 'Мои пары', '🏠Меню']])
         await state.set_state(TestStates.all()[4])
         text = 'Выберите вариант' + str(message.chat.id)
         await message.reply(text,
@@ -322,9 +322,6 @@ async def second_test_state_case_met(message: types.Message):
                             reply_markup=keyboard)
         await state.set_state(TestStates.all()[5])
 
-
-
-
     elif message.text == '➖ Удалить пару':
         try:
             curs.execute(f"SELECT pair_name from users where chat_id = {message.chat.id}")
@@ -339,11 +336,11 @@ async def second_test_state_case_met(message: types.Message):
 
         keyboard = types.ReplyKeyboardMarkup(resize_keyboard=True)
         text = 'Ваш портфель:\n'
-        j = 0
+        j = 1
         for i in checks:
-            text += f'{str(j)}: *{i}*\n'
+            text += f'{str(j)}: *{i[0]}*\n'
             keyboard.add(*[types.KeyboardButton(name) for name in
-                           [f'{i}']])
+                           [f'{i[0]}']])
             j += 1
         text +='\nКакую монету удалить?'
 
@@ -386,9 +383,6 @@ async def second_test_state_case_met(message: types.Message):
             await message.reply('Эта пара уже добавлена вами, выберите другую!\n',
                                 reply=False,
                                 reply_markup=keyboard)
-
-    elif message.text == '🔕Удалить пару':
-        pass
 
     else:
         await message.reply('Не понял тебя, воспользуйся кнопками.',
