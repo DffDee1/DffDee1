@@ -118,7 +118,7 @@ async def check_new_pair(message):
         checks = curs.fetchall()
 
     for i in checks:
-        if message.text in i:
+        if message.text.upper() in i:
             return False
 
     return True
@@ -401,7 +401,6 @@ async def second_test_state_case_met(message: types.Message):
     keyboard = types.ReplyKeyboardMarkup(resize_keyboard=True)
 
     if await check_pair(message.text.upper() + 'USDT'):
-
         if await check_new_pair(message):
             await save(message)
             await message.reply('Введите кол-во монет',
@@ -473,7 +472,7 @@ async def second_test_state_case_met(message: types.Message):
         await bot.send_message(message.chat.id,
                                'Ввести нужно не цифры, воспользуйтесь кнопками!')
         return None
-    
+
     elif check_pair_in_db(message):
 
         try:
