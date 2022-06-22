@@ -372,6 +372,8 @@ async def second_test_state_case_met(message: types.Message):
                 keyboard.add(*[types.KeyboardButton(name) for name in
                                [f'{i[0]}']])
                 j += 1
+            keyboard.add(*[types.KeyboardButton(name) for name in
+                           ['🏠Меню']])
             text += '\nКакую монету удалить?'
             await state.set_state(TestStates.all()[7])
 
@@ -511,7 +513,8 @@ async def second_test_state_case_met(message: types.Message):
         str1 = message.text.upper()
         str1 = str1.split('/')
         pair = str1[0] + str1[1]
-        if check_pair(pair):
+        is_pair = check_pair(pair)
+        if is_pair:
             price = await get_price_of_pair(pair)
             await bot.send_message(message.chat.id,
                                    await print_price(price))
