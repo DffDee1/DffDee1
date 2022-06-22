@@ -44,8 +44,7 @@ async def print_price(json_get):
 
 
 async def get_price_usdt(message):
-    # str1 = message.text.upper()
-    str1 = message
+    str1 = message.text.upper()
     str1 = str1.split()
 
     if str1[1] != 'USDT':
