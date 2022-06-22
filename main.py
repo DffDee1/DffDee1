@@ -445,9 +445,13 @@ async def second_test_state_case_met(message: types.Message):
 
     try:
         await delete(message)
+        keyboard = types.ReplyKeyboardMarkup(resize_keyboard=True)
+        keyboard.add(*[types.KeyboardButton(name) for name in
+                       ['Указать валюту', 'Выбрать валюту', '🏠Меню']])
         await bot.send_message(message.chat.id,
                                f'Пара {message.text.upper()} была удалена, возвращаемся в меню!\n\n'
-                               f'Выберите вариант.')
+                               f'Выберите вариант.',
+                               reply_markup=keyboard)
         await state.set_state(TestStates.all()[1])
 
     except:
