@@ -453,14 +453,15 @@ async def second_test_state_case_met(message: types.Message):
     if '/' in message.text[1:]:
         str1 = message.text.upper()
         str1 = str1.split('/')
-        price = await get_price_of_pair(str1[0] + str1[1])
-        await bot.send_message(message.chat.id,
-                               await print_price(price))
-
-    elif 'pair' in message.text[:5]:
-        price = await get_price_of_pair(message.text[5:].upper())
-        await bot.send_message(message.chat.id,
-                               await print_price(price))
+        pair = str1[0] + str1[1]
+        if check_pair(pair):
+            price = await get_price_of_pair(pair)
+            await bot.send_message(message.chat.id,
+                                   await print_price(price))
+        else:
+            await bot.send_message(message.chat.id,
+                                   '_Пара не найдена, проверьте правильность написания!_',
+                                   parse_mode=ParseMode.MARKDOWN)
 
     elif '+' in message.text:
         await bot.send_message(message.chat.id, await plus_func(message))
@@ -476,7 +477,8 @@ async def second_test_state_case_met(message: types.Message):
         keyboard.add(*[types.KeyboardButton(name) for name in
                        ['Гос. валюты', 'Криптовалюты', 'Уведомления']])
         await bot.send_message(message.chat.id,
-                               'Не понял тебя, воспользуйся кнопками!', reply_markup=keyboard)
+                               'Не понял тебя, возвращаемся в меню.\n'
+                               'Воспользуйся кнопками!', reply_markup=keyboard)
         await state.set_state(TestStates.all()[1])
 
 
