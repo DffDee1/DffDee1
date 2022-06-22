@@ -34,7 +34,7 @@ try:
                 chat_id BIGINT NOT NULL,
                 pair_name VARCHAR (100) NOT NULL UNIQUE,
                 old_price REAL NOT NULL,
-                percent INTEGER NOT NULL
+                amount REAL NOT NULL
                 );'''
     curs.execute(create_table_query)
     conn.commit()
@@ -49,7 +49,7 @@ except (Exception, Error) as error:
                     chat_id BIGINT NOT NULL,
                     pair_name VARCHAR (100) NOT NULL,
                     old_price REAL NOT NULL,
-                    percent INTEGER NOT NULL
+                    amount REAL NOT NULL
                     );'''
     curs.execute(create_table_query)
     conn.commit()
@@ -79,7 +79,8 @@ async def view_portf(message):
     for i in checks:
         price = await get_price_of_pair(i[2])
         price = float(price['price'])
-        text += f'{i[2]} в кол-ве {i[4]}: {price} (+{(i[3] - price) / price * 100}%)\n'
+        percent = round((i[3] - price) / price * 100, 2)
+        text += f'{i[2]} в кол-ве {i[4]}: {price} ({"+" if percent > 0 else ""}{percent}%)\n'
 
     return text
 
@@ -105,7 +106,7 @@ async def check_new_pair(message):
 async def save(message):
 
     try:
-        insert_query = """ INSERT INTO users (chat_id, pair_name, old_price,percent)
+        insert_query = """ INSERT INTO users (chat_id, pair_name, old_price, amount)
                                                                       VALUES (%s, %s, %s, %s)"""
         old_p = await get_price_of_pair(message.text)
         item_tuple = (message.chat.id, message.text, str(round(float(old_p['price']), 3)), 12345)
@@ -117,20 +118,12 @@ async def save(message):
         print("Ошибка при работе с PostgreSQL 2", error)
         curs.execute("rollback")
 
-        insert_query = """ INSERT INTO users (chat_id, pair_name, old_price,percent)
+        insert_query = """ INSERT INTO users (chat_id, pair_name, old_price, amount)
                                                                               VALUES (%s, %s, %s, %s)"""
         old_p = await get_price_of_pair(message.text)
         item_tuple = (message.chat.id, message.text, str(round(float(old_p['price']), 3)), 12345)
         curs.execute(insert_query, item_tuple)
         conn.commit()
-
-
-# async def read(user_id):
-#     messages = await database.fetch_all('SELECT text '
-#                                         'FROM messages '
-#                                         'WHERE telegram_id = :telegram_id ',
-#                                         values={'telegram_id': user_id})
-#     return messages
 
 
 async def read(message):
@@ -366,7 +359,7 @@ async def second_test_state_case_met(message: types.Message):
     try:
         if int(message.text) > 0:
             try:
-                insert_query = f"UPDATE users SET percent = {int(message.text)} WHERE percent = '12345'"
+                insert_query = f"UPDATE users SET amount = {int(message.text)} WHERE amount = '12345'"
                 curs.execute(insert_query)
                 conn.commit()
 
@@ -375,7 +368,7 @@ async def second_test_state_case_met(message: types.Message):
                 print("Ошибка при работе с PostgreSQL 4", error)
                 curs.execute("rollback")
 
-                insert_query = f"UPDATE users SET percent = {int(message.text)} WHERE percent = '12345'"
+                insert_query = f"UPDATE users SET amount = {int(message.text)} WHERE amount = '12345'"
                 curs.execute(insert_query)
                 conn.commit()
             keyboard.add(*[types.KeyboardButton(name) for name in
