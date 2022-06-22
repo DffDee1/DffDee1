@@ -327,7 +327,7 @@ async def second_test_state_case_met(message: types.Message):
     state = dp.current_state(user=message.from_user.id)
     keyboard = types.ReplyKeyboardMarkup(resize_keyboard=True)
 
-    if await check_pair(message.text):
+    if await check_pair(message.text.upper() + 'USDT'):
 
         if await check_new_pair(message):
             await save(message)
