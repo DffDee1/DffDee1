@@ -151,16 +151,16 @@ async def read(message):
 def delete(message):
 
     try:
-        curs.execute(f"DELETE FROM users"
-                     f"WHERE user_id={message.chat.id} AND pair = {message.text};")
+        curs.execute(f"DELETE FROM users "
+                     f"WHERE chat_id = {message.chat.id} AND pair = {message.text};")
         conn.commit()
 
     except (Exception, Error) as error:
         print("Ошибка при работе с PostgreSQL 3", error)
         curs.execute("rollback")
 
-        curs.execute(f"DELETE FROM users"
-                     f"WHERE user_id={message.chat.id} AND pair = {message.text};")
+        curs.execute(f"DELETE FROM users "
+                     f"WHERE chat_id = {message.chat.id} AND pair = {message.text};")
         conn.commit()
 
 
