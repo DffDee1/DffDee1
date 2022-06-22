@@ -1,8 +1,3 @@
-import asyncio
-import logging
-import os
-
-import aioschedule
 import psycopg2
 from aiogram import Bot, types
 from aiogram.contrib.fsm_storage.memory import MemoryStorage
@@ -76,12 +71,14 @@ async def view_portf(message):
         checks = curs.fetchall()
 
     text = ''
+    price_of_all = 0
     for i in checks:
-        price = await get_price_of_pair(i[2])
+        price = await get_price_of_pair(i[2] + 'USDT')
         price = float(price['price'])
         percent = round((i[3] - price) / price * 100, 2)
-        text += f'{i[2]} в кол-ве {i[4]}: {price} ({"+" if percent > 0 else ""}{percent}%)\n'
-
+        text += f'*{i[2]}* в кол-ве _{i[4]}_: *{price}*$ ({"+" if percent > 0 else ""}{percent}%)\n'
+        price_of_all += price
+    text += f'Общая сумма активов - {price_of_all}$'
     return text
 
 
@@ -98,7 +95,7 @@ async def check_new_pair(message):
         checks = curs.fetchall()
 
     for i in checks:
-        if message.text in i:
+        if message.text in i or message.text:
             return False
     return True
 
@@ -108,7 +105,12 @@ async def save(message):
     try:
         insert_query = """ INSERT INTO users (chat_id, pair_name, old_price, amount)
                                                                       VALUES (%s, %s, %s, %s)"""
-        old_p = await get_price_of_pair(message.text)
+
+        try:
+            old_p = await get_price_of_pair(message.text)
+        except:
+            old_p = await get_price_of_pair(message.text + 'USDT')
+
         item_tuple = (message.chat.id, message.text, str(round(float(old_p['price']), 3)), 12345)
         curs.execute(insert_query, item_tuple)
         conn.commit()
@@ -292,8 +294,8 @@ async def second_test_state_case_met(message: types.Message):
 
     if message.text == '🔔Добавить пару':
         keyboard = await menu_add()
-        await message.reply('Введите слитно пару, которую хотите добавить в портфель.\n'
-                            'Например, "btcrub" без кавычек.',
+        await message.reply('Введите монету, которую хотите добавить в портфель.\n'
+                            'Например, "btc" без кавычек.',
                             reply=False,
                             reply_markup=keyboard)
         await state.set_state(TestStates.all()[5])
