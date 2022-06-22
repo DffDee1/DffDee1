@@ -6,7 +6,7 @@ from aiogram.dispatcher import Dispatcher
 from aiogram.utils.executor import start_webhook
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from psycopg2 import Error
-
+from telegram import ParseMode
 from config import *
 from soupbruh import *
 from utils import *
@@ -103,12 +103,14 @@ async def check_new_pair(message):
 async def save(message):
 
     try:
-        insert_query = """ INSERT INTO users (chat_id, pair_name, old_price, amount)
-                                                                                      VALUES (%s, %s, %s, %s)"""
+        insert_query = """ 
+        INSERT INTO users (chat_id, pair_name, old_price, amount)
+        VALUES (%s, %s, %s, %s)
+        """
 
         old_p = await get_price_of_pair(message.text.upper() + 'USDT')
 
-        item_tuple = (message.chat.id, message.text, str(round(float(old_p['price']), 3)), 12345)
+        item_tuple = (message.chat.id, message.text.upper(), str(round(float(old_p['price']), 3)), 12345)
         curs.execute(insert_query, item_tuple)
         conn.commit()
 
@@ -117,14 +119,17 @@ async def save(message):
         print("Ошибка при работе с PostgreSQL 2", error)
         curs.execute("rollback")
 
-        insert_query = """ INSERT INTO users (chat_id, pair_name, old_price, amount)
-                                                                              VALUES (%s, %s, %s, %s)"""
+        insert_query = """ 
+        INSERT INTO users (chat_id, pair_name, old_price, amount) 
+        VALUES (%s, %s, %s, %s)
+        """
 
         old_p = await get_price_of_pair(message.text.upper() + 'USDT')
 
-        item_tuple = (message.chat.id, message.text, str(round(float(old_p['price']), 3)), 12345)
+        item_tuple = (message.chat.id, message.text.upper(), str(round(float(old_p['price']), 3)), 12345)
         curs.execute(insert_query, item_tuple)
         conn.commit()
+
 
 async def read(message):
     try:
@@ -138,6 +143,22 @@ async def read(message):
         curs.execute(f"SELECT pair_name from users where chat_id = {message.chat.id}")
         checks = curs.fetchall()
     return checks
+
+
+def delete(message):
+
+    try:
+        curs.execute(f"DELETE FROM users"
+                     f"WHERE user_id = '{message.chat.id}' AND pair = {message.text};")
+        conn.commit()
+
+    except (Exception, Error) as error:
+        print("Ошибка при работе с PostgreSQL 3", error)
+        curs.execute("rollback")
+
+        curs.execute(f"DELETE FROM users"
+                     f"WHERE user_id = '{message.chat.id}' AND pair = {message.text};")
+        conn.commit()
 
 
 async def menu(message):
@@ -290,7 +311,7 @@ async def second_test_state_case_met(message: types.Message):
     state = dp.current_state(user=message.from_user.id)
     keyboard = types.ReplyKeyboardMarkup(resize_keyboard=True)
 
-    if message.text == '🔔Добавить пару':
+    if message.text == '➕ Добавить пару':
         keyboard = await menu_add()
         await message.reply('Введите монету, которую хотите добавить в портфель.\n'
                             'Например, "btc" без кавычек.',
@@ -298,18 +319,42 @@ async def second_test_state_case_met(message: types.Message):
                             reply_markup=keyboard)
         await state.set_state(TestStates.all()[5])
 
-    elif message.text == '🔕Удалить пару':
-        # keyboard.add(*[types.KeyboardButton(name) for name in
-        #                ['🇷🇺RUB', '🇺🇸USDT', '🌐BTC', '🏠Меню']])
-        # await state.set_state(TestStates.all()[3])
-        await message.reply('wait plz',
-                            reply=False,
-                            reply_markup=keyboard)
+
+
+
+    elif message.text == '➖ Удалить пару':
+        try:
+            curs.execute(f"SELECT pair_name from users where chat_id = {message.chat.id}")
+            checks = curs.fetchall()
+
+        except (Exception, Error) as error:
+            print("Ошибка при работе с PostgreSQL 3", error)
+            curs.execute("rollback")
+
+            curs.execute(f"SELECT pair_name from users where chat_id = {message.chat.id}")
+            checks = curs.fetchall()
+
+        keyboard = types.ReplyKeyboardMarkup(resize_keyboard=True)
+        text = 'Ваш портфель:\n'
+        j = 0
+        for i in checks:
+            text += f'{str(j)}: *{i}*\n'
+            keyboard.add(*[types.KeyboardButton(name) for name in
+                           [f'{i}']])
+            j += 1
+        text +='\nКакую монету удалить?'
+
+        await bot.send_message(message.chat.id,
+                               text,
+                               reply_markup=keyboard,
+                               parse_mode=ParseMode.MARKDOWN)
+        await state.set_state(TestStates.all()[7])
 
     elif message.text == 'Мои пары':
-        aboba = await view_portf(message)
-        await message.reply(aboba,
-                            reply=False)
+        text = await view_portf(message)
+        await message.reply(text,
+                            reply=False,
+                            parse_mode=ParseMode.MARKDOWN)
 
     else:
         await message.reply('Не понял тебя, воспользуйся кнопками.',
@@ -389,10 +434,12 @@ async def second_test_state_case_met(message: types.Message):
                             reply=False)
 
 
-@dp.message_handler(state=TestStates.TEST_STATE_7)
+@dp.message_handler(state=TestStates.TEST_STATE_7)                                                        # PORTF DELETE
 async def second_test_state_case_met(message: types.Message):
     state = dp.current_state(user=message.from_user.id)
-    await message.reply('7!', reply=False)
+
+    delete(message)
+    await state.set_state(TestStates.all()[1])
 
 
 @dp.message_handler(state=TestStates.TEST_STATE_8)
@@ -401,7 +448,7 @@ async def second_test_state_case_met(message: types.Message):
     await message.reply('8!', reply=False)
 
 
-@dp.message_handler(state=TestStates.TEST_STATE_9)     # SOLO FUNC
+@dp.message_handler(state=TestStates.TEST_STATE_9)                                                           # SOLO FUNC
 async def second_test_state_case_met(message: types.Message):
     state = dp.current_state(user=message.from_user.id)
 
