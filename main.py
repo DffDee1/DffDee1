@@ -27,7 +27,7 @@ try:
                 CREATE TABLE IF NOT EXISTS users (
                 id SERIAL PRIMARY KEY,
                 chat_id BIGINT NOT NULL,
-                pair_name VARCHAR (100) NOT NULL UNIQUE,
+                pair_name VARCHAR (100) NOT NULL,
                 old_price REAL NOT NULL,
                 amount REAL NOT NULL
                 );'''
