@@ -109,7 +109,7 @@ async def save(message):
         try:
             old_p = await get_price_of_pair(message.text)
         except:
-            old_p = await get_price_of_pair(message.text + 'USDT')
+            old_p = await get_price_of_pair(message.text.upper() + 'USDT')
 
         item_tuple = (message.chat.id, message.text, str(round(float(old_p['price']), 3)), 12345)
         curs.execute(insert_query, item_tuple)
@@ -126,7 +126,7 @@ async def save(message):
         try:
             old_p = await get_price_of_pair(message.text)
         except:
-            old_p = await get_price_of_pair(message.text + 'USDT')
+            old_p = await get_price_of_pair(message.text.upper() + 'USDT')
 
         item_tuple = (message.chat.id, message.text, str(round(float(old_p['price']), 3)), 12345)
         curs.execute(insert_query, item_tuple)
