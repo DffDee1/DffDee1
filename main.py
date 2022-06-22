@@ -63,6 +63,26 @@ async def on_shutdown(dispatcher):
     await bot.delete_webhook()
 
 
+async def view_portf(message):
+    try:
+        curs.execute(f"SELECT * from users where chat_id = {message.chat.id}")
+        checks = curs.fetchall()
+
+    except (Exception, Error) as error:
+        print("Ошибка при работе с PostgreSQL 3", error)
+        curs.execute("rollback")
+
+        curs.execute(f"SELECT * from users where chat_id = {message.chat.id}")
+        checks = curs.fetchall()
+
+    text = ''
+    for i in checks:
+        price = get_price_of_pair(i[2])["price"]
+        text += f'{i[2]} в кол-ве {i[4]}: {price} (+{(i[3] - price) / price * 100}%)\n'
+
+    return text
+
+
 async def check_new_pair(message):
     try:
         curs.execute(f"SELECT pair_name from users where chat_id = {message.chat.id}")
@@ -293,7 +313,7 @@ async def second_test_state_case_met(message: types.Message):
                             reply_markup=keyboard)
 
     elif message.text == 'Мои пары':
-        aboba = await read(message)
+        aboba = await view_portf(message)
         await message.reply(aboba,
                             reply=False)
 
@@ -357,18 +377,18 @@ async def second_test_state_case_met(message: types.Message):
                 insert_query = f"UPDATE users SET percent = {int(message.text)} WHERE percent = '12345'"
                 curs.execute(insert_query)
                 conn.commit()
-        keyboard.add(*[types.KeyboardButton(name) for name in
-                       ['🔔Добавить пару', '🔕Удалить пару', 'Мои пары', '🏠Меню']])
-        await state.set_state(TestStates.all()[4])
-        text = 'ура\n' \
-               'Выберите вариант' + str(message.chat.id)
-        await message.reply(text,
-                            reply=False,
-                            reply_markup=keyboard)
+            keyboard.add(*[types.KeyboardButton(name) for name in
+                           ['🔔Добавить пару', '🔕Удалить пару', 'Мои пары', '🏠Меню']])
+            await state.set_state(TestStates.all()[4])
+            text = 'ура\n' \
+                   'Выберите вариант' + str(message.chat.id)
+            await message.reply(text,
+                                reply=False,
+                                reply_markup=keyboard)
+            return None
 
     except ValueError:
         await message.reply('Введите число', reply=False)
-
 
     else:
         await message.reply('Не понял тебя, воспользуйся кнопками.',
