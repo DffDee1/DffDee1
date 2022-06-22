@@ -168,7 +168,7 @@ async def menu(message):
     state = dp.current_state(user=message.from_user.id)
     keyboard = types.ReplyKeyboardMarkup(resize_keyboard=True)
     keyboard.add(*[types.KeyboardButton(name) for name in
-                   ['Гос. валюты', 'Криптовалюты', '🔔Уведомления']])
+                   ['Гос. валюты', 'Криптовалюты', '💼 Портфель']])
     await bot.send_message(message.chat.id,
                            text="Вы вернулись в меню)",
                            reply_markup=keyboard)
@@ -191,7 +191,7 @@ async def start(message: types.Message):
         await menu(message)
 
     keyboard.add(*[types.KeyboardButton(name) for name in
-                   ['Гос. валюты', 'Криптовалюты', '🔔Уведомления']])
+                   ['Гос. валюты', 'Криптовалюты', '💼 Портфель']])
     text = 'Привет, {}! Я умею показывать курсы валют и обменники!\n' \
            'Ты можешь воспользоваться вариантами из фотографии или продолжить кнопками!' \
         .format(message.from_user.first_name)
@@ -225,7 +225,7 @@ async def first_test_state_case_met(message: types.Message):
                             reply=False,
                             reply_markup=keyboard)
 
-    elif message.text == '🔔Уведомления':
+    elif message.text == '💼 Портфель':
         keyboard.add(*[types.KeyboardButton(name) for name in
                        ['➕ Добавить пару', '➖ Удалить пару', 'Мои пары', '🏠Меню']])
         await state.set_state(TestStates.all()[4])
@@ -414,7 +414,7 @@ async def second_test_state_case_met(message: types.Message):
                 curs.execute(insert_query)
                 conn.commit()
             keyboard.add(*[types.KeyboardButton(name) for name in
-                           ['🔔Добавить пару', '🔕Удалить пару', 'Мои пары', '🏠Меню']])
+                           ['➕ Добавить пару', '➖ Удалить пару', 'Мои пары', '🏠Меню']])
             await state.set_state(TestStates.all()[4])
             text = 'ура\n' \
                    'Выберите вариант' + str(message.chat.id)
@@ -475,7 +475,7 @@ async def second_test_state_case_met(message: types.Message):
     else:
         keyboard = types.ReplyKeyboardMarkup(resize_keyboard=True)
         keyboard.add(*[types.KeyboardButton(name) for name in
-                       ['Гос. валюты', 'Криптовалюты', 'Уведомления']])
+                       ['Гос. валюты', 'Криптовалюты', '💼 Портфель']])
         await bot.send_message(message.chat.id,
                                'Не понял тебя, возвращаемся в меню.\n'
                                'Воспользуйся кнопками!', reply_markup=keyboard)
