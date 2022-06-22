@@ -313,11 +313,10 @@ async def second_test_state_case_met(message: types.Message):
         await menu(message)
         return None
 
-    keyboard = await menu_add()
-
     state = dp.current_state(user=message.from_user.id)
 
     if message.text == '➕ Добавить пару':
+        keyboard = await menu_add()
         await message.reply('Введите монету, которую хотите добавить в портфель.\n'
                             'Например, "btc" без кавычек.',
                             reply=False,
@@ -339,6 +338,7 @@ async def second_test_state_case_met(message: types.Message):
         if len(checks) < 1:
             text = 'Вы еще не добавили ни одной пары!\n' \
                    'Воспользуйтесь кнопками, чтобы добавить!'
+            keyboard = None
 
         else:
             keyboard = types.ReplyKeyboardMarkup(resize_keyboard=True)
