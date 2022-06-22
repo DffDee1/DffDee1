@@ -69,7 +69,9 @@ async def view_portf(message):
 
         curs.execute(f"SELECT * from users where chat_id = {message.chat.id}")
         checks = curs.fetchall()
-    
+    if len(checks) < 1:
+        return 'Вы еще не добавили ни одной пары!\n' \
+               'Воспользуйтесь кнопками, чтобы добавить!'
     text = ''
     price_of_all = 0
     for i in checks:
@@ -311,11 +313,11 @@ async def second_test_state_case_met(message: types.Message):
         await menu(message)
         return None
 
+    keyboard = await menu_add()
+
     state = dp.current_state(user=message.from_user.id)
-    keyboard = types.ReplyKeyboardMarkup(resize_keyboard=True)
 
     if message.text == '➕ Добавить пару':
-        keyboard = await menu_add()
         await message.reply('Введите монету, которую хотите добавить в портфель.\n'
                             'Например, "btc" без кавычек.',
                             reply=False,
@@ -334,21 +336,26 @@ async def second_test_state_case_met(message: types.Message):
             curs.execute(f"SELECT pair_name from users where chat_id = {message.chat.id}")
             checks = curs.fetchall()
 
-        keyboard = types.ReplyKeyboardMarkup(resize_keyboard=True)
-        text = 'Ваш портфель:\n'
-        j = 1
-        for i in checks:
-            text += f'{str(j)}: *{i[0]}*\n'
-            keyboard.add(*[types.KeyboardButton(name) for name in
-                           [f'{i[0]}']])
-            j += 1
-        text +='\nКакую монету удалить?'
+        if len(checks) < 1:
+            text = 'Вы еще не добавили ни одной пары!\n' \
+                   'Воспользуйтесь кнопками, чтобы добавить!'
+
+        else:
+            keyboard = types.ReplyKeyboardMarkup(resize_keyboard=True)
+            text = 'Ваш портфель:\n'
+            j = 1
+            for i in checks:
+                text += f'{str(j)}: *{i[0]}*\n'
+                keyboard.add(*[types.KeyboardButton(name) for name in
+                               [f'{i[0]}']])
+                j += 1
+            text +='\nКакую монету удалить?'
+            await state.set_state(TestStates.all()[7])
 
         await bot.send_message(message.chat.id,
                                text,
                                reply_markup=keyboard,
                                parse_mode=ParseMode.MARKDOWN)
-        await state.set_state(TestStates.all()[7])
 
     elif message.text == 'Мои пары':
         text = await view_portf(message)
