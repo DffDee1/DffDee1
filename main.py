@@ -76,13 +76,15 @@ async def view_portf(message):
         price = await get_price_of_pair(i[2] + 'USDT')
         price = float(price['price'])
         percent = round((i[3] - price) / price * 100, 2)
-        text += f'*{i[2]}* в кол-ве _{i[4]}_: *{price}*$ ({"+" if percent > 0 else ""}{percent}%)\n'
-        price_of_all += price
-    text += f'Общая сумма активов - {price_of_all}$'
+        text += f'*{i[2]}* в кол-ве _{i[4]}_: *{price * i[4]}*$ ({"+" if percent > 0 else ""}{percent}%)\n'
+        price_of_all += price * i[4]
+    text += f'------------------------------\n' \
+            f'Общая сумма активов = {price_of_all}$'
     return text
 
 
 async def check_new_pair(message):
+
     try:
         curs.execute(f"SELECT pair_name from users where chat_id = {message.chat.id}")
         checks = curs.fetchall()
@@ -97,6 +99,7 @@ async def check_new_pair(message):
     for i in checks:
         if message.text in i:
             return False
+
     return True
 
 
@@ -392,7 +395,7 @@ async def second_test_state_case_met(message: types.Message):
                             reply=False)
 
 
-@dp.message_handler(state=TestStates.TEST_STATE_6)                                                       # PORTF PERCENT
+@dp.message_handler(state=TestStates.TEST_STATE_6)                                                        # PORTF AMOUNT
 async def second_test_state_case_met(message: types.Message):
     if message.text == '🏠Меню':
         await menu(message)
@@ -402,9 +405,9 @@ async def second_test_state_case_met(message: types.Message):
     keyboard = types.ReplyKeyboardMarkup(resize_keyboard=True)
 
     try:
-        if int(message.text) > 0:
+        if float(message.text) > 0:
             try:
-                insert_query = f"UPDATE users SET amount = {int(message.text)} WHERE amount = '12345'"
+                insert_query = f"UPDATE users SET amount = {float(message.text)} WHERE amount = '12345'"
                 curs.execute(insert_query)
                 conn.commit()
 
@@ -427,7 +430,8 @@ async def second_test_state_case_met(message: types.Message):
             return None
 
     except ValueError:
-        await message.reply('Введите число', reply=False)
+        await message.reply('Введите число\n'
+                            'Если число не целое, вводите через точку.', reply=False)
 
     else:
         await message.reply('Не понял тебя, воспользуйся кнопками.',
