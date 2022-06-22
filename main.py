@@ -87,7 +87,7 @@ async def save(message):
         insert_query = """ INSERT INTO users (chat_id, pair_name, old_price,percent)
                                                                       VALUES (%s, %s, %s, %s)"""
         old_p = await get_price_of_pair(message.text)
-        item_tuple = (message.chat.id, message.text, str(round(float(old_p['price']), 3)), 6)
+        item_tuple = (message.chat.id, message.text, str(round(float(old_p['price']), 3)), 12345)
         curs.execute(insert_query, item_tuple)
         conn.commit()
 
@@ -99,7 +99,7 @@ async def save(message):
         insert_query = """ INSERT INTO users (chat_id, pair_name, old_price,percent)
                                                                               VALUES (%s, %s, %s, %s)"""
         old_p = await get_price_of_pair(message.text)
-        item_tuple = (message.chat.id, message.text, str(round(float(old_p['price']), 3)), 6)
+        item_tuple = (message.chat.id, message.text, str(round(float(old_p['price']), 3)), 12345)
         curs.execute(insert_query, item_tuple)
         conn.commit()
 
@@ -267,7 +267,7 @@ async def second_test_state_case_met(message: types.Message):
     await state.set_state(TestStates.all()[9])
 
 
-@dp.message_handler(state=TestStates.TEST_STATE_4)                                                               # NOTIF
+@dp.message_handler(state=TestStates.TEST_STATE_4)                                                               # PORTF
 async def second_test_state_case_met(message: types.Message):
     if message.text == '🏠Меню':
         await menu(message)
@@ -278,7 +278,7 @@ async def second_test_state_case_met(message: types.Message):
 
     if message.text == '🔔Добавить пару':
         keyboard = await menu_add()
-        await message.reply('Введите слитно пару, которую хотите добавить в уведомления.\n'
+        await message.reply('Введите слитно пару, которую хотите добавить в портфель.\n'
                             'Например, "btcrub" без кавычек.',
                             reply=False,
                             reply_markup=keyboard)
@@ -302,7 +302,7 @@ async def second_test_state_case_met(message: types.Message):
                             reply=False)
 
 
-@dp.message_handler(state=TestStates.TEST_STATE_5)                                                           # NOTIF ADD
+@dp.message_handler(state=TestStates.TEST_STATE_5)                                                           # PORTF ADD
 async def second_test_state_case_met(message: types.Message):
     if message.text == '🏠Меню':
         await menu(message)
@@ -315,11 +315,10 @@ async def second_test_state_case_met(message: types.Message):
 
         if await check_new_pair(message):
             await save(message)
-            await message.reply('Введите процент\n'
-                                'при изменении цены на (введённый процент) вам будет приходить уведомление!\n',
+            await message.reply('Введите кол-во монет',
                                 reply=False,
                                 reply_markup=keyboard)
-            await state.set_state(TestStates.all()[1])
+            await state.set_state(TestStates.all()[6])
 
         else:
             await message.reply('Эта пара уже добавлена вами, выберите другую!\n',
@@ -334,26 +333,46 @@ async def second_test_state_case_met(message: types.Message):
                             reply=False)
 
 
-# @dp.message_handler(state=TestStates.TEST_STATE_6)                                                     # NOTIF PERCENT
-# async def second_test_state_case_met(message: types.Message):
-#     if message.text == '🏠Меню':
-#         await menu(message)
-#         return None
-#
-#     state = dp.current_state(user=message.from_user.id)
-#     keyboard = types.ReplyKeyboardMarkup(resize_keyboard=True)
-#
-#     try:
-#         if int(message.text) > 1:
-#
-#
-#     except ValueError:
-#         await message.reply('Пары к какой валюте предлагать?', reply=False)
-#
-#
-#     else:
-#         await message.reply('Не понял тебя, воспользуйся кнопками.',
-#                             reply=False)
+@dp.message_handler(state=TestStates.TEST_STATE_6)                                                       # PORTF PERCENT
+async def second_test_state_case_met(message: types.Message):
+    if message.text == '🏠Меню':
+        await menu(message)
+        return None
+
+    state = dp.current_state(user=message.from_user.id)
+    keyboard = types.ReplyKeyboardMarkup(resize_keyboard=True)
+
+    try:
+        if int(message.text) > 0:
+            try:
+                insert_query = f"UPDATE users SET percent = {int(message.text)} WHERE percent = '12345'"
+                curs.execute(insert_query)
+                conn.commit()
+
+            except (Exception, Error) as error:
+
+                print("Ошибка при работе с PostgreSQL 4", error)
+                curs.execute("rollback")
+
+                insert_query = f"UPDATE users SET percent = {int(message.text)} WHERE percent = '12345'"
+                curs.execute(insert_query)
+                conn.commit()
+        keyboard.add(*[types.KeyboardButton(name) for name in
+                       ['🔔Добавить пару', '🔕Удалить пару', 'Мои пары', '🏠Меню']])
+        await state.set_state(TestStates.all()[4])
+        text = 'ура\n' \
+               'Выберите вариант' + str(message.chat.id)
+        await message.reply(text,
+                            reply=False,
+                            reply_markup=keyboard)
+
+    except ValueError:
+        await message.reply('Введите число', reply=False)
+
+
+    else:
+        await message.reply('Не понял тебя, воспользуйся кнопками.',
+                            reply=False)
 
 
 @dp.message_handler(state=TestStates.TEST_STATE_7)
