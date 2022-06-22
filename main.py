@@ -99,7 +99,7 @@ async def check_pair_in_db(message):
 
     for i in checks:
         if message.text.upper() in i:
-            return True
+            return i
 
     return False
 
@@ -473,26 +473,28 @@ async def second_test_state_case_met(message: types.Message):
                                'Ввести нужно не цифры, воспользуйтесь кнопками!')
         return None
 
-    elif check_pair_in_db(message):
+    x = await check_pair_in_db(message)
+    await bot.send_message(message.chat.id, 
+                           str(x))
 
-        try:
-            await delete(message)
-            keyboard = types.ReplyKeyboardMarkup(resize_keyboard=True)
-            keyboard.add(*[types.KeyboardButton(name) for name in
-                           ['Гос. валюты', 'Криптовалюты', '💼 Портфель']])
-            await bot.send_message(message.chat.id,
-                                   f'Пара {message.text.upper()} была удалена, возвращаемся в меню!\n\n'
-                                   f'Выберите вариант.',
-                                   reply_markup=keyboard)
-            await state.set_state(TestStates.all()[1])
+        # try:
+        #     await delete(message)
+        #     keyboard = types.ReplyKeyboardMarkup(resize_keyboard=True)
+        #     keyboard.add(*[types.KeyboardButton(name) for name in
+        #                    ['Гос. валюты', 'Криптовалюты', '💼 Портфель']])
+        #     await bot.send_message(message.chat.id,
+        #                            f'Пара {message.text.upper()} была удалена, возвращаемся в меню!\n\n'
+        #                            f'Выберите вариант.',
+        #                            reply_markup=keyboard)
+        #     await state.set_state(TestStates.all()[1])
+        #
+        # except:
+        #     await bot.send_message(message.chat.id,
+        #                            'Выбрана несуществующая пара, воспользуйтесь кнопками!')
 
-        except:
-            await bot.send_message(message.chat.id,
-                                   'Выбрана несуществующая пара, воспользуйтесь кнопками!')
-
-    else:
-        await bot.send_message(message.chat.id,
-                               'Выбрана несуществующая пара, воспользуйтесь кнопками!')
+    # else:
+    #     await bot.send_message(message.chat.id,
+    #                            'Выбрана несуществующая пара, воспользуйтесь кнопками!')
 
 
 # @dp.message_handler(state=TestStates.TEST_STATE_8)
