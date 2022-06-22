@@ -518,9 +518,14 @@ async def second_test_state_case_met(message: types.Message):
         pair = str1[0] + str1[1]
         is_pair = check_pair(pair)
         if is_pair:
-            price = await get_price_of_pair(pair)
-            await bot.send_message(message.chat.id,
-                                   await print_price(price))
+            try:
+                price = await get_price_of_pair(pair)
+                await bot.send_message(message.chat.id,
+                                       await print_price(price))
+            except:
+                await bot.send_message(message.chat.id,
+                                       '_Пара не найдена, проверьте правильность написания!_',
+                                       parse_mode=ParseMode.MARKDOWN)
         else:
             await bot.send_message(message.chat.id,
                                    '_Пара не найдена, проверьте правильность написания!_',
@@ -529,8 +534,9 @@ async def second_test_state_case_met(message: types.Message):
     elif '+' in message.text:
         await bot.send_message(message.chat.id, await plus_func(message))
 
-    elif message.text[0].isdigit() and len(message.text[1]) > 1:
-        await bot.send_message(message.chat.id, await get_price_usdt(message))
+    elif message.text[0].isdigit():
+        if check_pair(message.text[2:].upper() + 'USDT'):
+            await bot.send_message(message.chat.id, await get_price_usdt(message))
 
     elif message.text == '🏠Меню':
         await menu(message)
