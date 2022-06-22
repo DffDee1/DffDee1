@@ -122,11 +122,15 @@ async def save(message):
 
         insert_query = """ INSERT INTO users (chat_id, pair_name, old_price, amount)
                                                                               VALUES (%s, %s, %s, %s)"""
-        old_p = await get_price_of_pair(message.text)
+
+        try:
+            old_p = await get_price_of_pair(message.text)
+        except:
+            old_p = await get_price_of_pair(message.text + 'USDT')
+
         item_tuple = (message.chat.id, message.text, str(round(float(old_p['price']), 3)), 12345)
         curs.execute(insert_query, item_tuple)
         conn.commit()
-
 
 async def read(message):
     try:
