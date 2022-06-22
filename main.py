@@ -104,12 +104,9 @@ async def save(message):
 
     try:
         insert_query = """ INSERT INTO users (chat_id, pair_name, old_price, amount)
-                                                                      VALUES (%s, %s, %s, %s)"""
+                                                                                      VALUES (%s, %s, %s, %s)"""
 
-        try:
-            old_p = await get_price_of_pair(message.text)
-        except:
-            old_p = await get_price_of_pair(message.text.upper() + 'USDT')
+        old_p = await get_price_of_pair(message.text.upper() + 'USDT')
 
         item_tuple = (message.chat.id, message.text, str(round(float(old_p['price']), 3)), 12345)
         curs.execute(insert_query, item_tuple)
@@ -123,10 +120,7 @@ async def save(message):
         insert_query = """ INSERT INTO users (chat_id, pair_name, old_price, amount)
                                                                               VALUES (%s, %s, %s, %s)"""
 
-        try:
-            old_p = await get_price_of_pair(message.text)
-        except:
-            old_p = await get_price_of_pair(message.text.upper() + 'USDT')
+        old_p = await get_price_of_pair(message.text.upper() + 'USDT')
 
         item_tuple = (message.chat.id, message.text, str(round(float(old_p['price']), 3)), 12345)
         curs.execute(insert_query, item_tuple)
