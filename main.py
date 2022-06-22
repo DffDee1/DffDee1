@@ -27,7 +27,6 @@ conn = psycopg2.connect(DATABASE_URL, sslmode='require')
 curs = conn.cursor()
 
 
-
 try:
     create_table_query = '''
                 CREATE TABLE IF NOT EXISTS users (
@@ -56,22 +55,8 @@ except (Exception, Error) as error:
     conn.commit()
 
 
-@dp.message_handler()
-async def choose_your_dinner():
-    await bot.send_message(chat_id=625676660,
-                           text="papapa",)
-
-
-async def scheduler():
-    aioschedule.every().day.at("14:30").do(choose_your_dinner)
-    while True:
-        await aioschedule.run_pending()
-        await asyncio.sleep(1)
-
-
 async def on_startup(dispatcher):
     await bot.set_webhook(WEBHOOK_URL, drop_pending_updates=True)
-    asyncio.create_task(scheduler())
 
 
 async def on_shutdown(dispatcher):
@@ -422,16 +407,17 @@ async def first_test_state_case_met(message: types.Message):
     await menu(message)
 
 
-async def send_mess():
-    await bot.send_message(625676660,
-                           'yeahhhh')
+async def main():
+    polling_task = asyncio.create_task(dp.start_polling())
+    while True:
+        await asyncio.sleep(60)
+        await bot.send_message(625676660, "Hello!")
 
-
-scheduler.add_job(send_mess, "interval", seconds=8, args=(dp,))
-
+loop = asyncio.get_event_loop()
 
 if __name__ == '__main__':
-    logging.basicConfig(level=logging.INFO)
+    loop.run_until_complete(main())
+    loop.close()
     start_webhook(
         dispatcher=dp,
         webhook_path=WEBHOOK_PATH,
