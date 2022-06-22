@@ -44,13 +44,15 @@ async def print_price(json_get):
 
 
 async def get_price_usdt(message):
-    str1 = message.text.upper()
+    # str1 = message.text.upper()
+    str1 = message
     str1 = str1.split()
+
     if str1[1] != 'USDT':
-        usdt = get_price_of_pair(str1[1] + 'USDT')
+        usdt = await get_price_of_pair(str1[1] + 'USDT')
         usdt = usdt['price']
         y = float(str1[0]) * float(usdt)
-        rub = get_price_of_pair('USDTRUB')
+        rub = await get_price_of_pair('USDTRUB')
         rub = rub['price']
         rub_price = y * float(rub)
         seq = ''
@@ -61,8 +63,9 @@ async def get_price_usdt(message):
         prnt = '🌐 ' + str1[0] + ' ' + str1[1] + ':\n' + seq \
                + '\n🇺🇸 ' + str(round(y, 2)) + '$\n🇷🇺 ' + str(round(rub_price, 1)) + '₽'
         return prnt
+
     else:
-        rub = get_price_of_pair('USDTRUB')
+        rub = await get_price_of_pair('USDTRUB')
         rub = float(rub['price'])
         seq = ''
         x = str(round(rub, 1))
@@ -77,14 +80,14 @@ async def get_price_usdt(message):
 async def plus_func(message):
     str1 = message.text.upper()
     str1 = str1.split()
-    usdt = get_price_of_pair(str1[1] + 'USDT')
+    usdt = await get_price_of_pair(str1[1] + 'USDT')
     usdt = usdt['price']
     y = float(str1[0]) * float(usdt)
-    usdt2 = get_price_of_pair(str1[4] + 'USDT')
+    usdt2 = await get_price_of_pair(str1[4] + 'USDT')
     usdt2 = usdt2['price']
     y2 = float(str1[3]) * float(usdt2)
     x = y + y2
-    rub = get_price_of_pair('USDTRUB')
+    rub = await get_price_of_pair('USDTRUB')
     rub = rub['price']
     rub_price = x * float(rub)
 
