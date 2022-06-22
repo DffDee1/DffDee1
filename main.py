@@ -69,7 +69,7 @@ async def view_portf(message):
 
         curs.execute(f"SELECT * from users where chat_id = {message.chat.id}")
         checks = curs.fetchall()
-
+    
     text = ''
     price_of_all = 0
     for i in checks:
@@ -148,7 +148,7 @@ async def read(message):
     return checks
 
 
-def delete(message):
+async def delete(message):
 
     try:
         curs.execute(f"DELETE FROM users "
@@ -436,8 +436,16 @@ async def second_test_state_case_met(message: types.Message):
 async def second_test_state_case_met(message: types.Message):
     state = dp.current_state(user=message.from_user.id)
 
-    delete(message)
-    await state.set_state(TestStates.all()[1])
+    try:
+        await delete(message)
+        await bot.send_message(message.chat.id,
+                               f'Пара {message.text.upper()} была удалена, возвращаемся в меню!\n\n'
+                               f'Выберите вариант.')
+        await state.set_state(TestStates.all()[1])
+
+    except:
+        await bot.send_message(message.chat.id,
+                               'Выбрана несуществующая пара, воспользуйтесь кнопками!')
 
 
 @dp.message_handler(state=TestStates.TEST_STATE_8)
