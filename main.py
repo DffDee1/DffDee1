@@ -78,7 +78,7 @@ async def view_portf(message):
     text = ''
     for i in checks:
         price = await get_price_of_pair(i[2])
-        price = price['price']
+        price = float(price['price'])
         text += f'{i[2]} в кол-ве {i[4]}: {price} (+{(i[3] - price) / price * 100}%)\n'
 
     return text
