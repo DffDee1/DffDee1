@@ -1,23 +1,20 @@
+import asyncio
 import logging
-from config import *
+import os
+
+import aioschedule
+import psycopg2
 from aiogram import Bot, types
-from aiogram.dispatcher import Dispatcher
-from aiogram.utils.executor import start_webhook
-from soupbruh import *
 from aiogram.contrib.fsm_storage.memory import MemoryStorage
 from aiogram.contrib.middlewares.logging import LoggingMiddleware
-from utils import *
-import os
-import psycopg2
-from psycopg2 import Error
-from schedule import every, repeat
-import schedule
-from multiprocessing import *
-import time
-import json
-from telegram import ParseMode
-import asyncio
+from aiogram.dispatcher import Dispatcher
+from aiogram.utils.executor import start_webhook
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
+from psycopg2 import Error
+
+from config import *
+from soupbruh import *
+from utils import *
 
 scheduler = AsyncIOScheduler()
 
@@ -59,8 +56,22 @@ except (Exception, Error) as error:
     conn.commit()
 
 
+@dp.message_handler()
+async def choose_your_dinner():
+    await bot.send_message(chat_id=625676660,
+                           text="papapa",)
+
+
+async def scheduler():
+    aioschedule.every().day.at("14:30").do(choose_your_dinner)
+    while True:
+        await aioschedule.run_pending()
+        await asyncio.sleep(1)
+
+
 async def on_startup(dispatcher):
     await bot.set_webhook(WEBHOOK_URL, drop_pending_updates=True)
+    asyncio.create_task(scheduler())
 
 
 async def on_shutdown(dispatcher):
@@ -416,8 +427,10 @@ async def send_mess():
                            'yeahhhh')
 
 
+scheduler.add_job(send_mess, "interval", seconds=8, args=(dp,))
+
+
 if __name__ == '__main__':
-    scheduler.add_job(send_mess, "interval", seconds=8, args=(dp,))
     logging.basicConfig(level=logging.INFO)
     start_webhook(
         dispatcher=dp,
