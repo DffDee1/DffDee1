@@ -152,7 +152,7 @@ def delete(message):
 
     try:
         curs.execute(f"DELETE FROM users "
-                     f"WHERE chat_id = {message.chat.id} AND pair = {message.text};")
+                     f"WHERE chat_id = {message.chat.id} AND pair_name = {message.text};")
         conn.commit()
 
     except (Exception, Error) as error:
@@ -160,7 +160,7 @@ def delete(message):
         curs.execute("rollback")
 
         curs.execute(f"DELETE FROM users "
-                     f"WHERE chat_id = {message.chat.id} AND pair = {message.text};")
+                     f"WHERE chat_id = {message.chat.id} AND pair_name = {message.text};")
         conn.commit()
 
 
