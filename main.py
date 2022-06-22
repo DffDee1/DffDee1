@@ -469,6 +469,9 @@ async def second_test_state_case_met(message: types.Message):
 @dp.message_handler(state=TestStates.TEST_STATE_7)                                                        # PORTF DELETE
 async def second_test_state_case_met(message: types.Message):
     state = dp.current_state(user=message.from_user.id)
+    if message.text == '🏠Меню':
+        await menu(message)
+        return None
 
     if message.text.isdigit():
         await bot.send_message(message.chat.id,
