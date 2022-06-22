@@ -236,6 +236,10 @@ async def first_test_state_case_met(message: types.Message):
                             reply=False,
                             reply_markup=keyboard)
 
+    else:
+        await message.reply('Не понял тебя, воспользуйся кнопками!',
+                            reply=False)
+
 
 @dp.message_handler(state=TestStates.TEST_STATE_2)                                                              # CRYPTO
 async def second_test_state_case_met(message: types.Message):
@@ -263,7 +267,7 @@ async def second_test_state_case_met(message: types.Message):
                             reply_markup=keyboard)
 
     else:
-        await message.reply('Не понял тебя, воспользуйся кнопками.',
+        await message.reply('Не понял тебя, воспользуйся кнопками!',
                             reply=False)
 
 
@@ -301,7 +305,7 @@ async def second_test_state_case_met(message: types.Message):
 
     else:
         await bot.send_message(message.chat.id,
-                               text="Не понял тебя, воспользуйся клавиатурой.")
+                               text="Не понял тебя, воспользуйся внопками!")
         return None
 
     await state.set_state(TestStates.all()[9])
@@ -364,7 +368,7 @@ async def second_test_state_case_met(message: types.Message):
                             parse_mode=ParseMode.MARKDOWN)
 
     else:
-        await message.reply('Не понял тебя, воспользуйся кнопками.',
+        await message.reply('Не понял тебя, воспользуйся кнопками!',
                             reply=False)
 
 
@@ -387,12 +391,13 @@ async def second_test_state_case_met(message: types.Message):
             await state.set_state(TestStates.all()[6])
 
         else:
-            await message.reply('Эта пара уже добавлена вами, выберите другую!\n',
+            await message.reply('Эта пара уже добавлена вами, введите другую!\n',
                                 reply=False,
                                 reply_markup=keyboard)
 
     else:
-        await message.reply('Не понял тебя, воспользуйся кнопками.',
+        await message.reply('Введена неизвестная монета, проверьте правильность написания!\n'
+                            'Это может быть например "btc", писать без кавычек.',
                             reply=False)
 
 
@@ -432,7 +437,9 @@ async def second_test_state_case_met(message: types.Message):
 
     except ValueError:
         await message.reply('Введите число\n'
-                            'Если число не целое, вводите через точку.', reply=False)
+                            'Если число не целое, вводите через точку.\n'
+                            'Например, "0.02" без кавычек!',
+                            reply=False)
 
     else:
         await message.reply('Не понял тебя, воспользуйся кнопками.',
@@ -447,7 +454,7 @@ async def second_test_state_case_met(message: types.Message):
         await delete(message)
         keyboard = types.ReplyKeyboardMarkup(resize_keyboard=True)
         keyboard.add(*[types.KeyboardButton(name) for name in
-                       ['Указать валюту', 'Выбрать валюту', '🏠Меню']])
+                       ['Гос. валюты', 'Криптовалюты', '💼 Портфель']])
         await bot.send_message(message.chat.id,
                                f'Пара {message.text.upper()} была удалена, возвращаемся в меню!\n\n'
                                f'Выберите вариант.',
@@ -485,7 +492,7 @@ async def second_test_state_case_met(message: types.Message):
     elif '+' in message.text:
         await bot.send_message(message.chat.id, await plus_func(message))
 
-    elif message.text[0].isdigit():
+    elif message.text[0].isdigit() and len(message.text[1]) > 1:
         await bot.send_message(message.chat.id, await get_price_usdt(message))
 
     elif message.text == '🏠Меню':
@@ -496,8 +503,8 @@ async def second_test_state_case_met(message: types.Message):
         keyboard.add(*[types.KeyboardButton(name) for name in
                        ['Гос. валюты', 'Криптовалюты', '💼 Портфель']])
         await bot.send_message(message.chat.id,
-                               'Не понял тебя, возвращаемся в меню.\n'
-                               'Воспользуйся кнопками!', reply_markup=keyboard)
+                               'Не понял тебя, возвращаемся в меню.\n',
+                               reply_markup=keyboard)
         await state.set_state(TestStates.all()[1])
 
 
