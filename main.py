@@ -474,27 +474,27 @@ async def second_test_state_case_met(message: types.Message):
         return None
 
     x = await check_pair_in_db(message)
-    await bot.send_message(message.chat.id, 
-                           str(x))
 
-        # try:
-        #     await delete(message)
-        #     keyboard = types.ReplyKeyboardMarkup(resize_keyboard=True)
-        #     keyboard.add(*[types.KeyboardButton(name) for name in
-        #                    ['Гос. валюты', 'Криптовалюты', '💼 Портфель']])
-        #     await bot.send_message(message.chat.id,
-        #                            f'Пара {message.text.upper()} была удалена, возвращаемся в меню!\n\n'
-        #                            f'Выберите вариант.',
-        #                            reply_markup=keyboard)
-        #     await state.set_state(TestStates.all()[1])
-        #
-        # except:
-        #     await bot.send_message(message.chat.id,
-        #                            'Выбрана несуществующая пара, воспользуйтесь кнопками!')
+    if x:
+        try:
+            await delete(message)
+            keyboard = types.ReplyKeyboardMarkup(resize_keyboard=True)
+            keyboard.add(*[types.KeyboardButton(name) for name in
+                           ['Гос. валюты', 'Криптовалюты', '💼 Портфель']])
+            await bot.send_message(message.chat.id,
+                                   f'Пара {message.text.upper()} была удалена, возвращаемся в меню!\n\n'
+                                   f'Выберите вариант.',
+                                   reply_markup=keyboard)
+            await state.set_state(TestStates.all()[1])
 
-    # else:
-    #     await bot.send_message(message.chat.id,
-    #                            'Выбрана несуществующая пара, воспользуйтесь кнопками!')
+        except:
+            await bot.send_message(message.chat.id,
+                                   'Ошибка bd.req\n'
+                                   'Попробуйте позже')
+
+    else:
+        await bot.send_message(message.chat.id,
+                               'Выбрана несуществующая пара, воспользуйтесь кнопками!')
 
 
 # @dp.message_handler(state=TestStates.TEST_STATE_8)
