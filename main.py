@@ -533,9 +533,13 @@ async def second_test_state_case_met(message: types.Message):
 
     elif message.text[0].isdigit():
         if check_pair(message.text[2:].upper() + 'USDT'):
-            price = await get_price_usdt(message)
-            await bot.send_message(message.chat.id,
-                                   price)
+            try:
+                price = await get_price_usdt(message)
+                await bot.send_message(message.chat.id,
+                                       price)
+            except KeyError:
+                await bot.send_message(message.chat.id,
+                                       'Что-то неверно. Проверьте правильность написания. ')
 
     elif message.text == '🏠Меню':
         await menu(message)
