@@ -98,7 +98,7 @@ async def check_pair_in_db(message):
         checks = curs.fetchall()
 
     for i in checks:
-        if message.text in i:
+        if message.text.upper() in i:
             return True
 
     return False
@@ -365,14 +365,14 @@ async def second_test_state_case_met(message: types.Message):
 
         else:
             keyboard = types.ReplyKeyboardMarkup(resize_keyboard=True)
-            text = 'Ваш портфель:\n'
+            text = 'Ваш портфель:\n\n'
             j = 1
             for i in checks:
                 text += f'{str(j)}: *{i[0]}*\n'
                 keyboard.add(*[types.KeyboardButton(name) for name in
                                [f'{i[0]}']])
                 j += 1
-            text +='\nКакую монету удалить?'
+            text += '\nКакую монету удалить?'
             await state.set_state(TestStates.all()[7])
 
         await bot.send_message(message.chat.id,
