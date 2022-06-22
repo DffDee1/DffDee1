@@ -407,17 +407,7 @@ async def first_test_state_case_met(message: types.Message):
     await menu(message)
 
 
-async def main():
-    polling_task = asyncio.create_task(dp.start_polling())
-    while True:
-        await asyncio.sleep(60)
-        await bot.send_message(625676660, "Hello!")
-
-loop = asyncio.get_event_loop()
-
 if __name__ == '__main__':
-    loop.run_until_complete(main())
-    loop.close()
     start_webhook(
         dispatcher=dp,
         webhook_path=WEBHOOK_PATH,
