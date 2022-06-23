@@ -407,7 +407,7 @@ async def second_test_state_case_met(message: types.Message):
             await save(message)
             await message.reply('Введите кол-во монет',
                                 reply=False,
-                                reply_markup=keyboard)
+                                reply_markup=types.ReplyKeyboardRemove())
             await state.set_state(TestStates.all()[6])
 
         else:
@@ -423,9 +423,6 @@ async def second_test_state_case_met(message: types.Message):
 
 @dp.message_handler(state=TestStates.TEST_STATE_6)                                                        # PORTF AMOUNT
 async def second_test_state_case_met(message: types.Message):
-    if message.text == '🏠Меню':
-        await menu(message)
-        return None
 
     state = dp.current_state(user=message.from_user.id)
     keyboard = types.ReplyKeyboardMarkup(resize_keyboard=True)
