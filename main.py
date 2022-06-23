@@ -248,7 +248,7 @@ async def first_test_state_case_met(message: types.Message):
 
     elif message.text == '💼 Портфель':
         keyboard.add(*[types.KeyboardButton(name) for name in
-                       ['➕ Добавить пару', '➖ Удалить пару', 'Мои монеты', '🏠Меню']])
+                       ['➕ Добавить монету', '➖ Удалить монету', 'Мои монеты', '🏠Меню']])
         await state.set_state(TestStates.all()[4])
         await message.reply('Выберите вариант',
                             reply=False,
