@@ -250,8 +250,7 @@ async def first_test_state_case_met(message: types.Message):
         keyboard.add(*[types.KeyboardButton(name) for name in
                        ['➕ Добавить пару', '➖ Удалить пару', 'Мои пары', '🏠Меню']])
         await state.set_state(TestStates.all()[4])
-        text = 'Выберите вариант' + str(message.chat.id)
-        await message.reply(text,
+        await message.reply('Выберите вариант',
                             reply=False,
                             reply_markup=keyboard)
 
@@ -338,7 +337,7 @@ async def second_test_state_case_met(message: types.Message):
 
     state = dp.current_state(user=message.from_user.id)
 
-    if message.text == '➕ Добавить пару':
+    if message.text == '➕ Добавить монету':
         keyboard = await menu_add()
         await message.reply('Введите монету, которую хотите добавить в портфель.\n'
                             'Например, "btc" без кавычек.',
@@ -346,7 +345,7 @@ async def second_test_state_case_met(message: types.Message):
                             reply_markup=keyboard)
         await state.set_state(TestStates.all()[5])
 
-    elif message.text == '➖ Удалить пару':
+    elif message.text == '➖ Удалить монету':
         try:
             curs.execute(f"SELECT pair_name from users where chat_id = {message.chat.id}")
             checks = curs.fetchall()
@@ -359,7 +358,7 @@ async def second_test_state_case_met(message: types.Message):
             checks = curs.fetchall()
 
         if len(checks) < 1:
-            text = 'Вы еще не добавили ни одной пары!\n' \
+            text = 'Вы еще не добавили ни одной монеты!\n' \
                    'Воспользуйтесь кнопками, чтобы добавить!'
             keyboard = None
 
@@ -382,7 +381,7 @@ async def second_test_state_case_met(message: types.Message):
                                reply_markup=keyboard,
                                parse_mode=ParseMode.MARKDOWN)
 
-    elif message.text == 'Мои пары':
+    elif message.text == 'Мои монеты':
         text = await view_portf(message)
         await message.reply(text,
                             reply=False,
@@ -411,7 +410,7 @@ async def second_test_state_case_met(message: types.Message):
             await state.set_state(TestStates.all()[6])
 
         else:
-            await message.reply('Эта пара уже добавлена вами, введите другую!\n',
+            await message.reply('Эта монета уже добавлена вами, введите другую!\n',
                                 reply=False,
                                 reply_markup=keyboard)
 
@@ -443,7 +442,7 @@ async def second_test_state_case_met(message: types.Message):
                 curs.execute(insert_query)
                 conn.commit()
             keyboard.add(*[types.KeyboardButton(name) for name in
-                           ['➕ Добавить пару', '➖ Удалить пару', 'Мои пары', '🏠Меню']])
+                           ['➕ Добавить монету', '➖ Удалить монету', 'Мои монеты', '🏠Меню']])
             await state.set_state(TestStates.all()[4])
             text = 'ура\n' \
                    'Выберите вариант' + str(message.chat.id)
@@ -484,7 +483,7 @@ async def second_test_state_case_met(message: types.Message):
             keyboard.add(*[types.KeyboardButton(name) for name in
                            ['Гос. валюты', 'Криптовалюты', '💼 Портфель']])
             await bot.send_message(message.chat.id,
-                                   f'Пара {message.text.upper()} была удалена, возвращаемся в меню!\n\n'
+                                   f'Монета *{message.text.upper()}* была удалена, возвращаемся в меню!\n\n'
                                    f'Выберите вариант.',
                                    reply_markup=keyboard)
             await state.set_state(TestStates.all()[1])
@@ -496,7 +495,7 @@ async def second_test_state_case_met(message: types.Message):
 
     else:
         await bot.send_message(message.chat.id,
-                               'Выбрана несуществующая пара, воспользуйтесь кнопками!')
+                               'Выбрана несуществующая монета, воспользуйтесь кнопками!')
 
 
 # @dp.message_handler(state=TestStates.TEST_STATE_8)
@@ -521,11 +520,11 @@ async def second_test_state_case_met(message: types.Message):
                                        await print_price(price))
             except:
                 await bot.send_message(message.chat.id,
-                                       '_Пара не найдена, проверьте правильность написания!_',
+                                       'Монета не найдена, проверьте правильность написания!_',
                                        parse_mode=ParseMode.MARKDOWN)
         else:
             await bot.send_message(message.chat.id,
-                                   '_Пара не найдена, проверьте правильность написания!_',
+                                   'Монета не найдена, проверьте правильность написания!_',
                                    parse_mode=ParseMode.MARKDOWN)
 
     elif message.text[0].isdigit():
