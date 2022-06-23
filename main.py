@@ -181,7 +181,7 @@ async def delete(message):
         curs.execute("rollback")
 
         curs.execute(f"DELETE FROM users "
-                     f"WHERE chat_id = {message.chat.id} AND pair_name = '{message.text.upper()';")
+                     f"WHERE chat_id = {message.chat.id} AND pair_name = '{message.text.upper()}';")
         conn.commit()
 
 
