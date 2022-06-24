@@ -270,7 +270,7 @@ async def second_test_state_case_met(message: types.Message):
     if message.text == '⌨Ввести свою пару':
         keyboard = await menu_add()
         await message.reply('Введите пару в формате "coin/coin"'
-                            '\nНапример "btc/rub" без кавычек!',
+                            '\nНапример, "btc/rub" или "10 xrp" без кавычек!',
                             reply=False,
                             reply_markup=keyboard)
         await state.set_state(TestStates.all()[9])
@@ -519,13 +519,15 @@ async def first_test_state_case_met(message: types.Message):
         await state.set_state(TestStates.all()[8])
 
     elif message.text == 'Популярные валюты':
-        text = 'Популярные гос. валюты:\n'
+        text = 'Популярные гос. валюты:\n' \
+               '================================='
 
         datas = await get_pop_vals_cb()
         for name, val, num in datas:
             text += f'{num} {name}: *{val}*р.\n'
         await bot.send_message(message.chat.id,
-                               text)
+                               text,
+                               parse_mode=ParseMode.MARKDOWN)
 
     else:
         await bot.send_message(message.chat.id,
