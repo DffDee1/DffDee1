@@ -552,7 +552,7 @@ async def second_test_state_case_met(message: types.Message):
 @dp.message_handler(state=TestStates.TEST_STATE_0)                                                                 # GOS
 async def first_test_state_case_met(message: types.Message):
     state = dp.current_state(user=message.from_user.id)
-    if message.text == '':
+    if message.text == 'Указать валюту':
         try:
             mas = get_value_cb(message.text)
             if len(mas) < 1:
@@ -566,7 +566,7 @@ async def first_test_state_case_met(message: types.Message):
                     text += f'{num}{name}: {round(val, 2)}р.\n'
         except:
             text = 'Что-то не так, проверьте правильность написания.'
-    
+
 
 
 
