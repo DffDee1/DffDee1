@@ -4,18 +4,16 @@ from aiogram.contrib.fsm_storage.memory import MemoryStorage
 from aiogram.contrib.middlewares.logging import LoggingMiddleware
 from aiogram.dispatcher import Dispatcher
 from aiogram.utils.executor import start_webhook
-from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from psycopg2 import Error
 from telegram import ParseMode
 from config import *
 from soupbruh import *
 from utils import *
 
-scheduler = AsyncIOScheduler()
 
 bot = Bot(token=TOKEN)
 dp = Dispatcher(bot, storage=MemoryStorage())
-dp.middleware.setup(LoggingMiddleware())
+dp.middleware.setup(LoggingMiddleware()
 
 DATABASE_URL = os.environ['DATABASE_URL']
 conn = psycopg2.connect(DATABASE_URL, sslmode='require')
@@ -444,8 +442,7 @@ async def second_test_state_case_met(message: types.Message):
             keyboard.add(*[types.KeyboardButton(name) for name in
                            ['➕ Добавить монету', '➖ Удалить монету', 'Мои монеты', '🏠Меню']])
             await state.set_state(TestStates.all()[4])
-            text = 'ура\n' \
-                   'Выберите вариант' + str(message.chat.id)
+            text = 'Выберите вариант'
             await message.reply(text,
                                 reply=False,
                                 reply_markup=keyboard)
@@ -485,7 +482,8 @@ async def second_test_state_case_met(message: types.Message):
             await bot.send_message(message.chat.id,
                                    f'Монета *{message.text.upper()}* была удалена, возвращаемся в меню!\n\n'
                                    f'Выберите вариант.',
-                                   reply_markup=keyboard)
+                                   reply_markup=keyboard,
+                                   parse_mode=ParseMode.MARKDOWN)
             await state.set_state(TestStates.all()[1])
 
         except:
