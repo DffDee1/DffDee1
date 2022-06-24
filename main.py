@@ -545,8 +545,9 @@ async def second_test_state_case_met(message: types.Message):
     state = dp.current_state(user=message.from_user.id)
     if message.text == '🏠Меню':
         await menu(message)
-    keyboard = await menu_add()
+        return None
 
+    keyboard = await menu_add()
     mas = await get_value_cb(message.text)
     if len(mas) < 1:
         await bot.send_message(message.chat.id,
