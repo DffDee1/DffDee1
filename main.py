@@ -449,6 +449,9 @@ async def second_test_state_case_met(message: types.Message):
                                 reply_markup=keyboard)
             return None
 
+        elif float(message.text) > 2047483647:
+            await message.reply('Число слишком большое, введите число до 2 млрд.',
+
     except ValueError:
         await message.reply('Введите число\n'
                             'Если число не целое, вводите через точку.\n'
