@@ -501,19 +501,16 @@ async def second_test_state_case_met(message: types.Message):
 async def second_test_state_case_met(message: types.Message):
     state = dp.current_state(user=message.from_user.id)
 
-    try:
-        mas = await get_value_cb(message.text)
-        if len(mas) < 1:
-            await bot.send_message(message.chat.id,
-                                   'Валюта не найдена, проверьте правильность написания!')
-            return None
-        else:
-            text = 'Найденные по запросу валюты:\n' \
-                   '----------------------------------\n'
-            for name, val, num in mas:
-                text += f'{num}{name}: {round(val, 2)}р.\n'
-    except:
-        text = 'Что-то не так, проверьте правильность написания.'
+    mas = await get_value_cb(message.text)
+    if len(mas) < 1:
+        await bot.send_message(message.chat.id,
+                               'Валюта не найдена, проверьте правильность написания!')
+        return None
+    else:
+        text = 'Найденные по запросу валюты:\n' \
+               '----------------------------------\n'
+        for name, val, num in mas:
+            text += f'{num}{name}: {round(val, 2)}р.\n'
 
     await bot.send_message(message.chat.id,
                            text)
