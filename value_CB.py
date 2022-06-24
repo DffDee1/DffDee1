@@ -7,6 +7,17 @@ url_act = 'https://cbr.ru/scripts/XML_daily.asp?date_req='
 file_actual = 'actual_values.json'
 
 
+async def get_pop_vals_cb():
+    response = requests.get(url_act)
+    datas = xmltodict.parse(response.content)
+    json.dumps(datas, ensure_ascii=False)
+    mas = []
+    for i in datas['ValCurs']['Valute']:
+        if i['CharCode'] in ['USD', 'EUR', 'BYN', 'KZT', 'CNY', 'JPY']:
+            mas.append([i['Name'], i['Value'], i['Nominal']])
+    return mas
+
+
 async def get_value_cb(mess):
     response = requests.get(url_act)
     datas = xmltodict.parse(response.content)
