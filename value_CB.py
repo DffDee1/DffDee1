@@ -16,7 +16,7 @@ async def get_pop_vals_cb():
     for i in datas['ValCurs']['Valute']:
         if i['CharCode'] in ['USD', 'EUR', 'BYN', 'KZT', 'CNY', 'JPY']:
             try:
-                mas.append([flags[i['CharCode'][:2]] + i['Name'], i['Value'], i['Nominal']])
+                mas.append([i['Name'], i['Value'], flags[i['CharCode'][:2]] + i['Nominal']])
             except KeyError:
                 mas.append([i['Name'], i['Value'], i['Nominal']])
 
@@ -34,7 +34,7 @@ async def get_value_cb(mess):
 
         if fuzz.WRatio(mess, i['Name']) >= 80 or mess.upper() == i['CharCode']:
             try:
-                mas.append([flags[i['CharCode'][:2]] + i['Name'], i['Value'], i['Nominal']])
+                mas.append([i['Name'], i['Value'], flags[i['CharCode'][:2]] + i['Nominal']])
             except KeyError:
                 mas.append([i['Name'], i['Value'], i['Nominal']])
 
