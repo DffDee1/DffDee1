@@ -426,7 +426,13 @@ async def second_test_state_case_met(message: types.Message):
     keyboard = types.ReplyKeyboardMarkup(resize_keyboard=True)
 
     try:
-        if float(message.text) > 0:
+
+        if float(message.text) > 2047483647:
+            await message.reply('Число слишком большое, введите число до 2 млрд.',
+                                reply=False)
+
+        elif float(message.text) > 0:
+
             try:
                 insert_query = f"UPDATE users SET amount = {float(message.text)} WHERE amount = '12345'"
                 curs.execute(insert_query)
@@ -449,10 +455,6 @@ async def second_test_state_case_met(message: types.Message):
                                 reply_markup=keyboard)
             return None
 
-        elif float(message.text) > 2047483647:
-            await message.reply('Число слишком большое, введите число до 2 млрд.',
-                                reply=False)
-
     except ValueError:
         await message.reply('Введите число\n'
                             'Если число не целое, вводите через точку.\n'
@@ -460,7 +462,7 @@ async def second_test_state_case_met(message: types.Message):
                             reply=False)
 
     else:
-        await message.reply('Не понял тебя, воспользуйся кнопками.',
+        await message.reply('Ты вводишь что-то неверно, введи число.',
                             reply=False)
 
 
