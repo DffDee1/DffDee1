@@ -522,8 +522,8 @@ async def first_test_state_case_met(message: types.Message):
         text = 'Популярные гос. валюты:\n'
 
         datas = await get_pop_vals_cb()
-        for num, name, val in datas:
-            text += f'{num} {name}: {val}р.\n'
+        for name, val, num in datas:
+            text += f'{num} {name}: *{val}*р.\n'
         await bot.send_message(message.chat.id,
                                text)
 
