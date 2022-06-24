@@ -510,7 +510,7 @@ async def second_test_state_case_met(message: types.Message):
         text = 'Найденные по запросу валюты:\n' \
                '----------------------------------\n'
         for name, val, num in mas:
-            text += f'{num}{name}: {round(val, 2)}р.\n'
+            text += f'{num}{name}: {round(float(val), 2)}р.\n'
 
     await bot.send_message(message.chat.id,
                            text)
