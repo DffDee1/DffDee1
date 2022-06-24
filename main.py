@@ -565,9 +565,13 @@ async def second_test_state_case_met(message: types.Message):
     state = dp.current_state(user=message.from_user.id)
 
     if '/' in message.text[1:]:
-        str1 = message.text.upper()
-        str1 = str1.split('/')
-        pair = str1[0] + str1[1]
+        try:
+            str1 = message.text.upper()
+            str1 = str1.split('/')
+            pair = str1[0] + str1[1]
+        except:
+            return None
+
         is_pair = check_pair(pair)
         if is_pair:
             try:
@@ -584,14 +588,17 @@ async def second_test_state_case_met(message: types.Message):
                                    parse_mode=ParseMode.MARKDOWN)
 
     elif message.text[0].isdigit():
-        if check_pair(message.text[2:].upper() + 'USDT'):
-            try:
-                price = await get_price_usdt(message)
-                await bot.send_message(message.chat.id,
-                                       price)
-            except KeyError:
-                await bot.send_message(message.chat.id,
-                                       'Что-то неверно. Проверьте правильность написания. ')
+        try:
+            if check_pair(message.text[2:].upper() + 'USDT'):
+                try:
+                    price = await get_price_usdt(message)
+                    await bot.send_message(message.chat.id,
+                                           price)
+                except KeyError:
+                    await bot.send_message(message.chat.id,
+                                           'Что-то неверно. Проверьте правильность написания. ')
+        except:
+            return None
 
     elif message.text == '🏠Меню':
         await menu(message)
