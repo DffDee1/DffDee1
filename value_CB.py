@@ -13,14 +13,10 @@ def get_value_cb(mess):
     json.dumps(datas, ensure_ascii=False)
     mas = []
     for i in datas['ValCurs']['Valute']:
-        k = i['Name'].split()
         if mess in ['ен', 'ена', 'йен', 'йена']:
             mess = 'иен'
 
-        if fuzz.WRatio(mess, i['Name']) >= 80:
+        if fuzz.WRatio(mess, i['Name']) >= 80 or mess.upper() == i['CharCode']:
             mas.append([i['Name'], i['Value'], i['Nominal']])
 
-        elif len(k) > 1:
-            if fuzz.WRatio(mess, k[1]) > 75 or fuzz.WRatio(mess, k[0]) > 75:
-                mas.append([i['Name'], i['Value']])
     return mas

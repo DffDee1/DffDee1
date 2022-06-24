@@ -497,10 +497,23 @@ async def second_test_state_case_met(message: types.Message):
                                'Выбрана несуществующая монета, воспользуйтесь кнопками!')
 
 
-# @dp.message_handler(state=TestStates.TEST_STATE_8)
-# async def second_test_state_case_met(message: types.Message):
-#     state = dp.current_state(user=message.from_user.id)
-#     await message.reply('8!', reply=False)
+@dp.message_handler(state=TestStates.TEST_STATE_8)
+async def second_test_state_case_met(message: types.Message):
+    state = dp.current_state(user=message.from_user.id)
+
+    try:
+        mas = get_value_cb(message.text)
+        if len(mas) < 1:
+            await bot.send_message(message.chat.id,
+                                   'Валюта не найдена, проверьте правильность написания!')
+            return None
+        else:
+            text = 'Найденные по запросу валюты:\n' \
+                   '----------------------------------\n'
+            for name, val, num in mas:
+                text += f'{num}{name}: {round(val, 2)}р.\n'
+    except:
+        text = 'Что-то не так, проверьте правильность написания.'
 
 
 @dp.message_handler(state=TestStates.TEST_STATE_9)                                                           # SOLO FUNC
@@ -553,21 +566,11 @@ async def second_test_state_case_met(message: types.Message):
 async def first_test_state_case_met(message: types.Message):
     state = dp.current_state(user=message.from_user.id)
     if message.text == 'Указать валюту':
-        try:
-            mas = get_value_cb(message.text)
-            if len(mas) < 1:
-                await bot.send_message(message.chat.id,
-                                       'Валюта не найдена, проверьте правильность написания!')
-                return None
-            else:
-                text = 'Найденные по запросу валюты:\n' \
-                       '----------------------------------\n'
-                for name, val, num in mas:
-                    text += f'{num}{name}: {round(val, 2)}р.\n'
-        except:
-            text = 'Что-то не так, проверьте правильность написания.'
-
-
+        if message.text == 'Указать валюту':
+            await bot.send_message(message.chat.id,
+                                   'Введите валюту, цену которой хотите получить\n'
+                                   'Например, "доллар" или "usd"')
+            await state.set_state(TestStates.all()[8])
 
 
 if __name__ == '__main__':
