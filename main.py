@@ -526,7 +526,7 @@ async def first_test_state_case_met(message: types.Message):
 
     elif message.text == 'Популярные валюты':
         text = 'Популярные гос. валюты:\n' \
-               '================================='
+               '=================================\n'
 
         datas = await get_pop_vals_cb()
         for name, val, num in datas:
