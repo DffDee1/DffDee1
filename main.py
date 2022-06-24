@@ -543,11 +543,15 @@ async def first_test_state_case_met(message: types.Message):
 @dp.message_handler(state=TestStates.TEST_STATE_8)                                                            # GOS FIND
 async def second_test_state_case_met(message: types.Message):
     state = dp.current_state(user=message.from_user.id)
+    if message.text == '🏠Меню':
+        await menu(message)
+    keyboard = menu_add()
 
     mas = await get_value_cb(message.text)
     if len(mas) < 1:
         await bot.send_message(message.chat.id,
-                               'Валюта не найдена, проверьте правильность написания!')
+                               'Валюта не найдена, проверьте правильность написания!',
+                               reply_markup=keyboard)
         return None
     else:
         text = 'Найденные по запросу валюты:\n' \
