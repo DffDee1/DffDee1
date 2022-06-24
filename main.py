@@ -9,6 +9,7 @@ from telegram import ParseMode
 from config import *
 from soupbruh import *
 from utils import *
+from value_CB import *
 
 
 bot = Bot(token=TOKEN)
@@ -550,7 +551,23 @@ async def second_test_state_case_met(message: types.Message):
 
 @dp.message_handler(state=TestStates.TEST_STATE_0)                                                                 # GOS
 async def first_test_state_case_met(message: types.Message):
-    await menu(message)
+    state = dp.current_state(user=message.from_user.id)
+    if message.text == '':
+        try:
+            mas = get_value_cb(message.text)
+            if len(mas) < 1:
+                await bot.send_message(message.chat.id,
+                                       'Валюта не найдена, проверьте правильность написания!')
+                return None
+            else:
+                text = 'Найденные по запросу валюты:\n' \
+                       '----------------------------------\n'
+                for name, val, num in mas:
+                    text += f'{num}{name}: {round(val, 2)}р.\n'
+        except:
+            text = 'Что-то не так, проверьте правильность написания.'
+    
+
 
 
 if __name__ == '__main__':
