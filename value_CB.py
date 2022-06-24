@@ -7,7 +7,7 @@ url_act = 'https://cbr.ru/scripts/XML_daily.asp?date_req='
 file_actual = 'actual_values.json'
 
 
-def get_value_cb(mess):
+async def get_value_cb(mess):
     response = requests.get(url_act)
     datas = xmltodict.parse(response.content)
     json.dumps(datas, ensure_ascii=False)
