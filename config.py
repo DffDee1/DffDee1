@@ -1,6 +1,7 @@
 import os
 flags = {'US': '🇺🇸', 'EU': '🇪🇺', 'RU': '🇷🇺', 'AU': '🇦🇺', 'JP': '🇯🇵', 'CN': '🇨🇳',
-         'GB': '🇬🇧', 'HK': '🇭🇰', 'CA': '🇨🇦', 'SG': '🇸🇬'}
+         'GB': '🇬🇧', 'HK': '🇭🇰', 'CA': '🇨🇦', 'SG': '🇸🇬', 'KZ': '🇰🇿', 'BY': '🇧🇾'}
+
 TOKEN = os.getenv('BOT_TOKEN')
 HEROKU_APP_NAME = os.getenv('HEROKU_APP_NAME')
 WEBHOOK_HOST = f'https://{HEROKU_APP_NAME}.herokuapp.com'
