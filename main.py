@@ -231,7 +231,7 @@ async def first_test_state_case_met(message: types.Message):
 
     if message.text == 'Гос. валюты':
         keyboard.add(*[types.KeyboardButton(name) for name in
-                       ['Указать валюту', 'Выбрать валюту', '🏠Меню']])
+                       ['Указать валюту', 'Популярные валюты', '🏠Меню']])
         await state.set_state(TestStates.all()[0])
         await message.reply('Выберите вариант!',
                             reply=False,
@@ -497,7 +497,26 @@ async def second_test_state_case_met(message: types.Message):
                                'Выбрана несуществующая монета, воспользуйтесь кнопками!')
 
 
-@dp.message_handler(state=TestStates.TEST_STATE_8)
+@dp.message_handler(state=TestStates.TEST_STATE_0)                                                                 # GOS
+async def first_test_state_case_met(message: types.Message):
+    state = dp.current_state(user=message.from_user.id)
+
+    if message.text == 'Указать валюту':
+        await bot.send_message(message.chat.id,
+                               'Введите валюту, цену которой хотите получить\n'
+                               'Например, "доллар" или "usd"')
+        await state.set_state(TestStates.all()[8])
+
+    elif message.text == 'Популярные валюты':
+        text = 'Популярные го. валюты:\n'
+        for i in ['usd', 'eur', 'byn', 'kzt', 'cny', 'jpy']:
+            for name, val, num in await get_value_cb(i):
+                text += f'{num} {name}: {val}р.\n'
+        await bot.send_message(message.chat.id,
+                               text)
+
+
+@dp.message_handler(state=TestStates.TEST_STATE_8)                                                            # GOS FIND
 async def second_test_state_case_met(message: types.Message):
     state = dp.current_state(user=message.from_user.id)
 
@@ -510,10 +529,11 @@ async def second_test_state_case_met(message: types.Message):
         text = 'Найденные по запросу валюты:\n' \
                '----------------------------------\n'
         for name, val, num in mas:
-            text += f'{num}{name}: {val[:len(val)-2]}р.\n'
+            text += f'{num} {name}: *{val[:len(val)-2]}*р.\n'
 
     await bot.send_message(message.chat.id,
-                           text)
+                           text,
+                           parse_mode=ParseMode.MARKDOWN)
 
 
 @dp.message_handler(state=TestStates.TEST_STATE_9)                                                           # SOLO FUNC
@@ -560,17 +580,6 @@ async def second_test_state_case_met(message: types.Message):
                                'Не понял тебя, возвращаемся в меню.\n',
                                reply_markup=keyboard)
         await state.set_state(TestStates.all()[1])
-
-
-@dp.message_handler(state=TestStates.TEST_STATE_0)                                                                 # GOS
-async def first_test_state_case_met(message: types.Message):
-    state = dp.current_state(user=message.from_user.id)
-    if message.text == 'Указать валюту':
-        if message.text == 'Указать валюту':
-            await bot.send_message(message.chat.id,
-                                   'Введите валюту, цену которой хотите получить\n'
-                                   'Например, "доллар" или "usd"')
-            await state.set_state(TestStates.all()[8])
 
 
 if __name__ == '__main__':
